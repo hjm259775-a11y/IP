@@ -134,6 +134,8 @@ Genric Routing Encapsulation，通用路由封装，标准的三层隧道技术�
 
 虚拟的隧道接口(Tunnel)
 
+隧道的两端必须得是在同一个网段
+
 
 
 
@@ -195,6 +197,102 @@ GRE头的以太网类型为0x0800代表下一步让IP协议处理
 拆完因为公网头协议为47代表之后让GRE协议处理，之后又因为以太网类型为0x0800让IP协议处理
 
 R2看到内网IP，==R2查看路由表==，发给2.0网段
+
+
+
+## GRE VPN优缺点
+
+**优点：**
+
+*   可以用当前最为普遍的IP网络作为承载网络：
+
+*   支持多种网络层协议
+
+*   支持组播和动态路由协议；
+
+*   配置简单、部署容易：
+
+
+
+**缺点：**
+
+*   点对点隧道：
+
+*   静态配置隧道参数；
+
+*   布置复杂连接关系时，代价巨大；
+
+*   缺乏安全性（传输公网的数据没有加密解密）
+
+*   不能分割地址空间 (不能解决私网地址冲突的问题：两个隧道所对应的私网网段可能重复)
+
+
+
+
+
+## 多Tunnel口冗余技术
+
+要是这条隧道对应的公网寄了，就炸了，所以，我们需要冗余
+
+
+
+作用：主隧道转发数据，备用隧道完全处于空闲状态；
+
+同时需要开启Keepalive（保活机制）来检测隧道运行状态
+
+![image-20260809164432193](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260809164432193.png)
+
+了解一下
+
+
+
+
+
+## 配置
+
+先看下要求：
+
+![image-20260809171219009](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260809171219009.png)
+
+跳过配置IP地址，动态路由等
+
+
+
+```
+[R2]interface Tunnel 0/0/0	
+[R2-Tunnel0/0/0]ip address 192.168.3.1 24
+设置隧道IP，注意两边隧道IP要在同一个网段
+
+[R2-Tunnel0/0/0]tunnel-protocol ?
+  gre        Generic Routing Encapsulation
+  ipsec      IPSEC Encapsulation
+  ipv4-ipv6  IP over IPv6 encapsulation
+  ipv6-ipv4  IPv6 over IP encapsulation
+  mpls       MPLS Encapsulation
+  none       Null Encapsulation
+[R2-Tunnel0/0/0]tunnel-protocol gre
+设置类型为GRE VPN
+
+[R2-Tunnel0/0/0]source 100.1.1.1
+设置自己的隧道所对应的公网IP
+
+[R2-Tunnel0/0/0]destination 100.2.2.2
+设置隧道对面的公网IP，也就是自己的目的地
+
+
+
+当然，R4也得配
+```
+
+
+
+
+
+```
+[R2]ip route-static 192.168.2.0 24 Tunnel 0/0/0
+
+还需要在边界设备上配置路由表，让他走隧道
+```
 
 
 
