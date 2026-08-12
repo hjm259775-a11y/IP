@@ -254,7 +254,7 @@ R2看到内网IP，==R2查看路由表==，发给2.0网段
 
 ![image-20260809171219009](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260809171219009.png)
 
-跳过配置IP地址，动态路由等
+跳过配置IP地址，动态路由等（顺嘴一提，配置RIP需要宣告192.168.3.0网段）
 
 
 
