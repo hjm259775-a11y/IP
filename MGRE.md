@@ -100,7 +100,15 @@ MGRE VPN的封装方式是gre p2mp
 
 
 
-不过需要注意的是，这和GRE不同的地方在于写路由表时，下一条地址不能写自己的出口路由，需要
+
+
+**路由表**
+
+不过需要注意的是，这和GRE不同的地方在于写路由表时，下一条地址不能写自己的出口路由，需要写目标区域所对应的隧道IP地址
+
+```
+[R1]ip route-static 192.168.2.0 24 192.168.5.2
+```
 
 
 
@@ -118,7 +126,7 @@ MGRE VPN的封装方式是gre p2mp
 
 
 
-
+**查看**
 
 ```
 [R1]display nhrp peer all
@@ -134,6 +142,20 @@ MGRE VPN的封装方式是gre p2mp
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+以及：
+
+![image-20260816032811203](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260816032811203.png)
 
 
 
