@@ -22,7 +22,7 @@
 
 
 
-PPPoE协议采用C/S方式，将Pp报文封装在以太网帧之内，使PPP帧可以在以太网上进行传输，同时让以太网可以具备PPP功能，在以太网上提供点到点的连接
+PPPoE协议采用C/S方式，将PPP报文封装在以太网帧之内，使PPP帧可以在以太网上进行传输，同时让以太网可以具备PPP功能，在以太网上提供点到点的连接
 
 ![image-20260807052254287](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260807052254287.png)
 
@@ -38,7 +38,7 @@ PPPoE协议采用C/S方式，将Pp报文封装在以太网帧之内，使PPP帧�
 
     ![image-20260807054248110](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260807054248110.png)
 
-    (1）由客户端向服务器端**广播**发送PADI报文，询问PPPoE服务器
+    (1）由客户端向服务器端**广播**发送PAD报文，询问PPPoE服务器
 
     ​	PADI (PPPOE Active Discovery Initiation)
 
