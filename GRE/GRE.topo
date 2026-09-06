@@ -48,7 +48,7 @@
         <shape type="1" filloption="0" color="16744448" upleftcorner="372,264" width="327" height="156" startpt="0,0" endpt="0,0" borderStyle="0" borderWidth="1" />
     </shapes>
     <txttips>
-        <txttip left="307" top="77" right="832" bottom="141" content="1、按照图示配置1P地址&#x0D;&#x0A;2、在R1和R3上配黑默认路由使公网区域互通&#x0D;&#x0A;3、在R1和R3上配黑GRE VPN，使两端私网能够互相访问，Tunnel口IP地址如图&#x0D;&#x0A;4、在R1和R3上配置RIPv2或者ospf或者静态，来传递两端私网路由" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="307" top="77" right="824" bottom="141" content="1、按照图示配置1P地址&#x0D;&#x0A;2、在R1和R3上配黑默认路由使公网区域互通&#x0D;&#x0A;3、在R1和R3上配黑GRE VPN，使两端私网能够互相访问，Tunnel口IP地址如图&#x0D;&#x0A;4、在R1和R3上配置RIPv2或者ospf或者静态，来传递两端私网路由" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="244" top="473" right="354" bottom="490" content="192.168.1.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="295" top="297" right="465" bottom="314" content="tunnel0:192.168.3.1/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="395" top="368" right="490" bottom="385" content="100.1.1.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
