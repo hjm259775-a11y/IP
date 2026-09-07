@@ -56,7 +56,7 @@ TRUNK
 
 ​	1，如果从链路上接收到一个tagged帧，**其实就是收到别的交换机发来的数据帧**，因为已经存在标签，所以不需要打标签，直接观察允许列表，是否放通VID，如果允许列表中存在，则直接转发；如果不存在，则直接丢弃该数据帧，不转发。
 
-​	2，如果从交换机的其他接口接收到一个数据帧，**就是要转发的时候**，因为已经存在标签，则不需要再打标签，之后要看允许列表是否允许该VID的数据帧通过，如果允许通过，还需要看此接口的U/T标记，因为是trunk接口，大多数要带标签发出，除非PVID和VLAN List相同时，发出时不带标签
+​	2，如果从交换机的其他接口接收到一个数据帧，**就是要转发的时候**，因为已经存在标签，则不需要再打标签，之后要看允许列表是否允许该VID的数据帧通过，如果允许通过，还需要看此接口的U/T标记，因为是trunk接口，大多数要带标签发出，==除非PVID和VLAN List相同时，发出时不带标签==
 
 ​	3，如果从链路上接收到一个untagged帧，先给数据帧打上接口PVID对应VID的标签，之后，查看VLAN LIST，如果VLAN LIST中存在对应的VID，则允许转发该数据帧。如果不存在，就丢弃
 
@@ -94,7 +94,7 @@ TRUNK
 
 
 
-你可能会问，那我用trunk不行吗🤓☝️，还真不行，首先要知道，发送给终端的数据帧是不能带标签的，不然会丢弃，而trunk的U只有一个名额可以不带数据，但是你要发给终端的也许是各种VID的数据帧，所以必须用hy来进行自定义U/T标记
+你可能会问，那我用trunk不行吗🤓☝️，还真不行，首先要知道，发送给终端的数据帧是不能带标签的，不然会丢弃，而trunk的U只有一个名额可以不带标签，但是你要发给终端的也许是各种VID的数据帧，所以必须用hy来进行自定义U/T标记
 
 
 
@@ -177,37 +177,7 @@ LW2就不写了，这也不是实验报告，和之前一样的
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+顺便一提，要是做VLAN间路由的话，多臂路由时交换机和路由器间的链路的VLAN类型是access，单臂路由是trunk（因为单臂路由不需要路由器识别802.1Q的标签）
 
 
 
@@ -258,4 +228,99 @@ LW2就不写了，这也不是实验报告，和之前一样的
 [SW2]display port vlan active
 查看VLAN
 ```
+
+```
+[SW1-GigabitEthernet0/0/6]undo port default vlan
+让本接口的VLAN恢复默认
+```
+
+
+
+
+
+------------------------
+
+
+
+下面我们来讲交换机的三层接口————SVI接口————也叫VLANIF接口（是交换机的虚拟接口）
+
+
+
+**二层交换机**，为了远程登陆方便管理，所以需要一个IP地址，自然，只需要一个VLANIF接口管理VLAN————配置VLANIF接口对应的VLAN
+
+
+
+**三层交换机**每一个VLAN都可以创建一个VLANIF接口，并且，三层交换机具有路由表，所以，很适合成为网关设备
+
+
+
+
+
+
+
+![image-20260907133958974](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260907133958974.png)
+
+```
+[LW1]interface Vlanif 2
+[LW1-Vlanif2]ip address 192.168.1.1 24
+
+[LW1]interface Vlanif 3
+[LW1-Vlanif3]ip address 192.168.2.1 24
+
+配置VLANIF接口，每个VLAN对应一个VLANIF接口（没有对应VLAN是没法创建VLANIF的）
+配置IP地址作为网关
+```
+
+
+
+```
+[LW1-Vlanif4]display ip interface brief
+
+Interface                         IP Address/Mask      Physical   Protocol  
+MEth0/0/1                         unassigned           down       down      
+NULL0                             unassigned           up         up(s)     
+Vlanif1                           unassigned           up         down      
+Vlanif2                           192.168.1.1/24       up         up        
+Vlanif3                           192.168.2.1/24       up         up        
+Vlanif4                           192.168.100.1/24     down       down
+可以看到，就算有了vlan和IP地址，没有实际的VLAN 4也是全down的
+
+
+
+
+[LW1]display ip routing-table
+
+Destination/Mask    Proto   Pre  Cost      Flags NextHop         Interface
+      127.0.0.0/8   Direct  0    0           D   127.0.0.1       InLoopBack0
+      127.0.0.1/32  Direct  0    0           D   127.0.0.1       InLoopBack0
+    192.168.1.0/24  Direct  0    0           D   192.168.1.1     Vlanif2
+    192.168.1.1/32  Direct  0    0           D   127.0.0.1       Vlanif2
+    192.168.2.0/24  Direct  0    0           D   192.168.2.1     Vlanif3                                         &
+    192.168.2.1/32  Direct  0    0           D   127.0.0.1       Vlanif3
+可以看到，交换机也有路由表了
+```
+
+
+
+每一个VLANIF都有一个自己的MAC地址
+
+
+
+**来模拟一下跨VLAN的通信过程：**
+
+​	PC1发送数据想给PC2
+
+​		SIP：192.168.1.10，DIP：192.168.2.10
+
+​		SMAC：PC1mac，DMAC：网关（VLANIF 2的mac）
+
+​	数据发送到LW1：
+
+​		会先打上VID为2的标签，之后查看DMAC，发现是给自己的，就解封装，同时也会把VID 2解掉（没错，刚打上就解掉了🤪），之后查看自己本地路由表&，发现2.0对应的是VLANIF 3接口，对应的物理接口分别是0/0/3和0/0/4，会在这些接口都发出以下，当然，trunk发出去时还要加上标签VID 3
+
+​		SIP：192.168.1.10，DIP：192.168.2.10
+
+​		SMAC：VLANIF 3网关，DMAC：PC3mac
+
+​	然后就把数据发到PC3了
 
