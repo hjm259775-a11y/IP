@@ -324,3 +324,23 @@ Destination/Mask    Proto   Pre  Cost      Flags NextHop         Interface
 
 ​	然后就把数据发到PC3了
 
+
+
+
+
+
+
+好，到目前为止，这些是三层交换机干的活，就是代替了之前IA里面最上面的路由器，三层交换机不需要建立子接口，像上面一样创建VLANIF和IP地址即可
+
+如图：
+
+![image-20260907200933557](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260907200933557.png)
+
+LW5和LW4之间是trunk接口
+
+详情可见VLAN2文件夹
+
+
+
+
+
