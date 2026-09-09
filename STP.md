@@ -355,11 +355,48 @@ RPC的计算方法---根网桥发出的RPC为0。其他设备发出的RPC为接�
 
 ## 配置
 
-<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260908231843061.png" alt="image-20260908231843061" style="zoom: 67%;" />
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260909125039313.png" alt="image-20260909125039313" style="zoom:67%;" />
+
+```
+[sw1]stp enable
+开启生成树协议（华为设备默认开启了生成树协议）
+```
+
+
+
+```
+[sw1]stp mode stp
+选择启用的模式（华为默认使用mstp）
+要进入stp的都得要敲
+```
+
+![image-20260909125623297](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260909125623297.png)
 
 
 
 
+
+```
+[sw1]display stp brief
+查看当前stp
+```
+
+![image-20260909130914681](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260909130914681.png)
+
+![image-20260909135519379](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260909135519379.png)
+
+ALTE代表本交换机的阻塞端口，ROOT代表根端口，DESI代表指定接口
+
+DISCARDING代表阻塞状态，FORWARDING代表转发状态	
+
+
+
+
+
+
+
+```
+```
 
 
 
