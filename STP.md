@@ -376,6 +376,8 @@ RPC的计算方法---根网桥发出的RPC为0。其他设备发出的RPC为接�
 
 
 
+
+
 ```
 [sw1]display stp brief
 查看当前stp
@@ -387,15 +389,70 @@ RPC的计算方法---根网桥发出的RPC为0。其他设备发出的RPC为接�
 
 ALTE代表本交换机的阻塞端口，ROOT代表根端口，DESI代表指定接口
 
-DISCARDING代表阻塞状态，FORWARDING代表转发状态	
+DISCARDING代表阻塞状态，FORWARDING代表转发状态
 
 
+
+
+
+
+
+
+
+当然，这些只是开启STP，下面讲怎么干涉选举
+
+```
+[sw1]stp priority 28672
+修改BID优先级
+默认值是32768，改优先级时得按4096的倍数
+```
 
 
 
 
 
 ```
+ [sw1-GigabitEthernet0/0/1]stp port priority 112
+ 修改PID优先级
+ 默认值是128，改优先级时得按16的倍数
+```
+
+
+
+```
+[sw1-GigabitEthernet0/0/1]stp cost ?
+  INTEGER<1-200000000>  Port path cost
+修改端口的RPC
+```
+
+
+
+```
+[sw1]stp pathcost-standard ?
+  dot1d-1998  IEEE 802.1D-1998
+  dot1t       IEEE 802.1T
+  legacy      Legacy
+修改设备的RPC计算标准
+上面讲过的RPC有很多种计算标准，这边可以修改
+```
+
+
+
+
+
+上面是修改具体数值，你还得自己计算，有没有方便的办法
+
+```
+[sw1]stp root primary
+
+primary将该设备设置为生成树的主根，相当于将设备BID中的优先级修改为0
+
+
+
+
+[sw1]stp root secondary
+
+secondary将该设备设置为生成树的备份根，相当于将设备BID中的优先级修改为4096
 ```
 
 
@@ -410,13 +467,11 @@ DISCARDING代表阻塞状态，FORWARDING代表转发状态
 
 
 
+802.1D生成树的缺点：
 
+​	1，收敛速度慢
 
-
-
-
-
-
+​	2，链路利用率低
 
 
 

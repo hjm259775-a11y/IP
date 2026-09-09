@@ -295,7 +295,7 @@ Destination/Mask    Proto   Pre  Cost      Flags NextHop         Interface
       127.0.0.1/32  Direct  0    0           D   127.0.0.1       InLoopBack0
     192.168.1.0/24  Direct  0    0           D   192.168.1.1     Vlanif2
     192.168.1.1/32  Direct  0    0           D   127.0.0.1       Vlanif2
-    192.168.2.0/24  Direct  0    0           D   192.168.2.1     Vlanif3                                         &
+    192.168.2.0/24  Direct  0    0           D   192.168.2.1     Vlanif3                               &
     192.168.2.1/32  Direct  0    0           D   127.0.0.1       Vlanif3
 可以看到，交换机也有路由表了
 ```
