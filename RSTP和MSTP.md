@@ -214,7 +214,7 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 
 
 
-## 配置
+## 配置MSTP
 
 
 
@@ -313,14 +313,14 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 
 
 
-
+干涉选举：
 
 ```
 [SW1]stp instance 1 root primary
-让SW1成为instance 1的主根
+让SW1成为instance 1区域的主根
 
 [SW3]stp instance 2 root secondary
-让SW3成为instance 2的fu根
+让SW3成为instance 2区域的副根
 ```
 
 
