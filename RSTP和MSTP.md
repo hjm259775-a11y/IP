@@ -224,11 +224,11 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 
 
 
-交换网络存在vLan1-10
+交换网络存在vLan 1-10
 
 1，vlan 1-5映射到instance1
 
-2，Vlan6-10 影射到instance2
+2，Vlan 6-10 影射到instance2
 
 3，sw1成为instance1的主根，instance2的备份根。
 
@@ -256,7 +256,7 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 修改映射关系
 
 [SW1-mst-region]active region-configuration
-激活以上命令，重要
+此命令可以激活以上命令，重要
 ```
 
 其他设备都一样
@@ -273,3 +273,90 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 ![image-20260910135113198](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260910135113198.png)
 
 注意：在没有任何操作时，设备默认使用MAC地址作为MST域名，修订等级默认为0。
+
+敲完命令之后：
+
+![image-20260910153144701](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260910153144701.png)
+
+```
+[SW2-mst-region]display stp brief 
+ MSTID  Port                        Role  STP State     Protection
+   0    GigabitEthernet0/0/1        DESI  FORWARDING      NONE
+   0    GigabitEthernet0/0/2        DESI  FORWARDING      NONE
+   1    GigabitEthernet0/0/1        DESI  FORWARDING      NONE
+   1    GigabitEthernet0/0/2        DESI  FORWARDING      NONE
+   2    GigabitEthernet0/0/1        DESI  FORWARDING      NONE
+   2    GigabitEthernet0/0/2        DESI  FORWARDING      NONE
+   
+   
+ [SW3]display stp brief 
+ MSTID  Port                        Role  STP State     Protection
+   0    GigabitEthernet0/0/1        ALTE  DISCARDING      NONE
+   0    GigabitEthernet0/0/2        ROOT  FORWARDING      NONE
+   1    GigabitEthernet0/0/1        ALTE  DISCARDING      NONE
+   1    GigabitEthernet0/0/2        ROOT  FORWARDING      NONE
+   2    GigabitEthernet0/0/1        ALTE  DISCARDING      NONE
+   2    GigabitEthernet0/0/2        ROOT  FORWARDING      NONE
+   
+<SW1>display stp brief 
+ MSTID  Port                        Role  STP State     Protection
+   0    GigabitEthernet0/0/1        DESI  FORWARDING      NONE
+   0    GigabitEthernet0/0/2        ROOT  FORWARDING      NONE
+   1    GigabitEthernet0/0/1        DESI  FORWARDING      NONE
+   1    GigabitEthernet0/0/2        ROOT  FORWARDING      NONE
+   2    GigabitEthernet0/0/1        DESI  FORWARDING      NONE
+   2    GigabitEthernet0/0/2        ROOT  FORWARDING      NONE   
+   
+   
+   可以看到，instance 1和instance 2选的角色都是一样的，所以需要干涉选举
+```
+
+
+
+
+
+```
+[SW1]stp instance 1 root primary
+让SW1成为instance 1的主根
+
+[SW3]stp instance 2 root secondary
+让SW3成为instance 2的fu根
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+port-group group-member GigabitEthernet 0/0/1 GigabitEthernet 0/0/2
+port link-type trunk
+port trunk allow-pass vlan 1 to 10
+
+qu
+
+stp enable
+stp mode mstp
+
+stp region-configuration
+
+region-name xgz
+
+revision-level 1
+
+instance 1 vlan 1 to 5
+instance 2 vlan 6 to 10
+
+active region-configuration
