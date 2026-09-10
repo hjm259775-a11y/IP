@@ -176,6 +176,8 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 
 
 
+
+
 ## MSTP
 
 
@@ -186,10 +188,25 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 
 
 
-Instance——实例——一个VLAN或者多个VLAN的集合，一个instance一棵树
+**Instance**——实例——一个VLAN或者多个VLAN的集合，一个instance一棵树
 
 ​	Insatnceid---12位二进制（0-4094）--- instance 0具有特殊含义---华为设备默认存在instance 0，所有的VLAN一开始都属于instance o。
 
+​		在BID中，优先级占据16位，但实际只使用了前四位，后面的12位称为拓展系统ID，在802.1S中，用来携带instanceid，区分不同树的配置BPDU。
+
+
+
+
+
+**region**————域————MST域————如果一个交换网络规模过大，可以划分成为多个MST域分别维护树形结构，当然，如果一个交换网络规模适中，则也可以只有一个MAST 域。
+
+设备划分到同一个MST域中时，需要保证一下三个参数完全相同
+
+​	1，region name域名（域名可以自定义）
+
+​	2，revsion level修订等级（同一区域所有设备的这个数字需要一样）
+
+​	3，instance和vlan的影射关系（每个设备所记的vlan和instance对应列表需要一致）
 
 
 
@@ -197,20 +214,62 @@ Instance——实例——一个VLAN或者多个VLAN的集合，一个instance�
 
 
 
+## 配置
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260910133030792.png" alt="image-20260910133030792" style="zoom:67%;" />
 
 
 
 
 
+交换网络存在vLan1-10
+
+1，vlan 1-5映射到instance1
+
+2，Vlan6-10 影射到instance2
+
+3，sw1成为instance1的主根，instance2的备份根。
+
+4，SW2作为instonce2的主根，instance1的备份根
+
+
+
+```
+[SW1]vlan batch 1 to 10
+[SW1]port-group group-member GigabitEthernet 0/0/1 GigabitEthernet 0/0/2
+[SW1-port-group]port link-type trunk
+[SW1-port-group]port trunk allow-pass vlan 1 to 10
+
+[SW1]stp enable
+[SW1]stp mode mstp
+
+[SW1]stp region-configuration
+进入region
+[SW1-mst-region]region-name xgz
+修改域名
+[SW1-mst-region]revision-level 1                                   INTEGER<0-65535>  Revision level
+修改修订等级
+[SW1-mst-region]instance 1 vlan 1 to 5
+[SW1-mst-region]instance 2 vlan 6 to 10
+修改映射关系
+
+[SW1-mst-region]active region-configuration
+激活以上命令，重要
+```
+
+其他设备都一样
 
 
 
 
 
+```
+[SW1-mst-region]display stp region-configuration
+查看当前设备的MST信息
+```
 
+![image-20260910135113198](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260910135113198.png)
 
-
-
-
-
-
+注意：在没有任何操作时，设备默认使用MAC地址作为MST域名，修订等级默认为0。
