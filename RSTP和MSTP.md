@@ -198,7 +198,7 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 
 
 
-**region**————域————MST域————如果一个交换网络规模过大，可以划分成为多个MST域分别维护树形结构，当然，如果一个交换网络规模适中，则也可以只有一个MAST 域。
+**region**————域————MST域————如果一个交换网络规模过大，可以划分成为多个MST域分别维护树形结构，当然，如果一个交换网络规模适中，则也可以只有一个MST域。（域里有多个实例）
 
 设备划分到同一个MST域中时，需要保证一下三个参数完全相同
 
@@ -244,6 +244,8 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 
 [SW1]stp enable
 [SW1]stp mode mstp
+开启生成树协议（华为设备默认开启了生成树协议）
+选择启用的模式（华为默认使用mstp）
 
 [SW1]stp region-configuration
 进入region
@@ -309,6 +311,7 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
    
    
    可以看到，instance 1和instance 2选的角色都是一样的，所以需要干涉选举
+   ROOT根端口，DESI转发端口，ALTE非指定端口
 ```
 
 
@@ -331,6 +334,14 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 
 
 
+添：
+
+```
+[SW1] interface GigabitEthernet 0/0/1
+[SW1-GigabitEthernet0/0/1] stp edged-port enable
+
+配置边缘接口
+```
 
 
 
@@ -338,25 +349,3 @@ P/A机制————RSTP加速收敛的核心机制（Agreement和Proposal）�
 
 
 
-
-
-
-port-group group-member GigabitEthernet 0/0/1 GigabitEthernet 0/0/2
-port link-type trunk
-port trunk allow-pass vlan 1 to 10
-
-qu
-
-stp enable
-stp mode mstp
-
-stp region-configuration
-
-region-name xgz
-
-revision-level 1
-
-instance 1 vlan 1 to 5
-instance 2 vlan 6 to 10
-
-active region-configuration

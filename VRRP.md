@@ -69,6 +69,8 @@
 ```
 [R2-GigabitEthernet0/0/1]vrrp vrid 1 virtual-ip 192.168.1.3
 配置VRID为1，虚拟IP为192.168.1.3
+
+在网关的接口配
 ```
 
 

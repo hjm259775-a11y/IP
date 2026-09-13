@@ -283,7 +283,7 @@ Vlanif1                           unassigned           up         down
 Vlanif2                           192.168.1.1/24       up         up        
 Vlanif3                           192.168.2.1/24       up         up        
 Vlanif4                           192.168.100.1/24     down       down
-可以看到，就算有了vlan和IP地址，没有实际的VLAN 4也是全down的
+可以看到，就算有了vlan和IP地址，没有实际的VLAN 4也是全down的（此设备没有放通该VLAN的接口）
 
 
 
@@ -328,6 +328,27 @@ Destination/Mask    Proto   Pre  Cost      Flags NextHop         Interface
 
 
 
+VLANIF 是**三层虚接口（逻辑接口）**，不是物理口，也不是二层口。
+
+| 属性        | 说明                                              |
+| :---------- | :------------------------------------------------ |
+| 层级        | 三层（网络层）                                    |
+| 本质        | 逻辑接口，由 VLAN 派生                            |
+| 接口类型    | 没有 access/trunk/hybrid 之分（那是二层口的概念） |
+| 编号        | 通常 `Vlanif <VLAN ID>`，如 Vlanif 3 对应 VLAN 3  |
+| 作用        | 作为该 VLAN 内主机的网关，做三层路由              |
+| 是否可配 IP | 可以，VLANIF 3 就配 192.168.2.1/24 之类的地址     |
+
+**一句话：VLANIF 是"给某个 VLAN 配的三层网关接口"，它只认三层参数（IP、路由），不认二层参数（接口类型、允许列表）。**
+
+
+
+
+
+
+
+
+
 
 
 好，到目前为止，这些是三层交换机干的活，就是代替了之前IA里面最上面的路由器，三层交换机不需要建立子接口，像上面一样创建VLANIF和IP地址即可
@@ -343,4 +364,24 @@ LW5和LW4之间是trunk接口
 
 
 
+
+添：
+
+```
+[SW3-GigabitEthernet0/0/5]undo portswitch
+将此接口变为三层口
+```
+
+
+
+```
+[SW] vlan 100                              ← 建互联 VLAN
+[SW] interface GigabitEthernet0/0/1
+[SW-GigabitEthernet0/0/1] port link-type access
+[SW-GigabitEthernet0/0/1] port default vlan 100   ← 链路划入 VLAN 100
+[SW] interface Vlanif 100
+[SW-Vlanif100] ip address 10.0.0.1 30      ← 配互联 IP
+
+三层交换机与路由器的拼接处
+```
 
