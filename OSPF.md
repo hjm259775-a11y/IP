@@ -22,7 +22,7 @@
 
 首先，我们要知道，OSPF的数据包的头部都是一样的
 
-<img src="C:\Users\xgz24\Desktop\2031.png" alt="2031" style="zoom:80%;" />
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916121837172.png" alt="image-20260916121837172" style="zoom:33%;" />
 
 版本————OSPF的版本（用的v2版本，0000 0010）
 
@@ -210,6 +210,45 @@ RID————发出该数据包设备的RID
 
 
 
+链路状态类型，链路状态ID，通告路由器---LSA的三元组，知道这三个就可以确定一条链路
+
+
+
+
+
+
+
+### LSU包
+
+------------------
+
+链路状态更新报文
+
+​	作用：真正携带LSA的数据包
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260915232302476.png" alt="image-20260915232302476" style="zoom:80%;" />
+
+LSA个数——LSA的个数
+
+LSA————具体的信息
+
+
+
+
+
+### LSACK包
+
+------------------
+
+ 链路状态确认报文---确认包
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916120406354.png" alt="image-20260916120406354" style="zoom:80%;" />
+
+LSA头部——把收到的LSA信息的头部再发回去，代表自己收到了
 
 
 
@@ -224,9 +263,24 @@ RID————发出该数据包设备的RID
 
 
 
-==**4，LSU包**==——链路状态更新报文——真正携带LSA的数据包
 
-==**5，LSACK包**==——链路状态确认报文---确认包
+
+
+
+
+顺便看下有意思的点：
+
+![image-20260916134315775](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916134315775.png)
+
+下面的DIP有些是224组播开头：
+
+​	有些是单播，因为像LSR、LSU、LSACK其实是两台设备之间的交流，单播正常，
+
+​	而组播是因为会触发更新，所以需要定期发送LSU
+
+
+
+
 
 
 
@@ -259,6 +313,25 @@ FULL状态---标志着邻接关系的建立。
 
 
 
+
+
+
+
+
+## OSPF接口网络类型
+
+（具体可以看网络类型和数据链路层协议那一篇笔记）
+
+*   P2P点到点网络
+
+*   MA多点接入网络
+    	BMA——支持广播的多点接入网络
+
+​	NBMA——不支持广播的多点接入网络
+
+
+
+以太网--- 因为以太网协议可以组件一个多点的网络环境，所以，不同的节点需要使用不同的MAC地址进行区分和标识
 
 
 
