@@ -310,7 +310,9 @@ FULL状态---标志着邻接关系的建立。
 
 
 
+添：
 
+Attempt——尝试状态——一方指定对端的单播邻居后，等待对方指定本端时所处于的状态————NBMA网络类型下特有的状态
 
 
 
@@ -359,32 +361,69 @@ P2P网络——仅能存在两台设备的网络，不需要使用MAC地址也�
 
 先查看OSPF接口的状态：
 
+
+
+### BMA
+
+
+
 <img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916164039341.png" alt="image-20260916164039341" style="zoom:67%;" />
 
 <img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916171705183.png" alt="image-20260916171705183" style="zoom:67%;" />
 
-上面是BMA的链路，下面是PPP的链路
+
+
+### PPP
+
+（PPP接口开销值甚至48（华为设备默认遵循的是E1标准——2.048MBps））
 
 <img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916172038093.png" alt="image-20260916172038093" style="zoom:67%;" />
 
 
 
+### 环回接口
+
+（华为设备中，环回接口的开销值被设定为0）
+
+​							华为设备中，环回接口对应的路由默认是按照主机路由进行学习的(就是你输入2.2.2.0/24，但实际在路由表是2.2.2.2/32)，想改吗？/奶龙笑.jpg/，将环回接口的接口网络类型改成Broadcast，`[r2-LoopBacko]ospf network-type broadcast`,就可以还原了
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916203236088.png" alt="image-20260916203236088" style="zoom:67%;" />
+
+
+
+### NBMA
+
+（帧中继）
+
+​	我们要知道，NBMA是一个没有广播和组播的网络类型，但是OSPF的邻居发现就是需要用到组播，这个时候。可以手动给他邻居，让他实现单播邻居，`[r1-ospf-1]peer 12.0.0.2`，`[r2-ospf-1]peer 12.0.0.1`，来实现OSPF的单播建邻
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916210255586.png" alt="image-20260916210255586" style="zoom:67%;" />
+
+​	
 
 
 
 
-PPP接口开销值甚至48（华为设备默认遵循的是E1标准——2.048MBps）
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916213637640.png" alt="image-20260916213637640" style="zoom:67%;" />
 
 
 
-**顺便一提：Broadcast接口可以和P2P建立邻居关系**
+**顺便一提：Broadcast接口可以和P2P建立邻居关系**（因为只看那五条），但是获取不到路由信息
 
 
 
-| 网络类型      | OSPF接口的网络类型和工作方式                                 |
-| ------------- | ------------------------------------------------------------ |
-| BMA（以太网） | 网络类型：Broadcast。工作方式：需要进行DR和BDR选举；hello时间为10S，死亡时间为40S；可以建立多个邻居关系 |
-| P2P（PPP）    | 网络类型：P2P。工作方式：不需要进行DR和BDR选举；hello时间为10S，死亡时间为40S；只能建立一个邻居关系 |
+
+
+
+
+| 网络类型       | OSPF接口的网络类型和工作方式                                 |
+| -------------- | ------------------------------------------------------------ |
+| BMA（以太网）  | 网络类型：Broadcast。工作方式：需要进行DR和BDR选举；hello时间为10S，死亡时间为40S；可以建立多个邻居关系 |
+| P2P（PPP）     | 网络类型：P2P。工作方式：不需要进行DR和BDR选举；hello时间为10S，死亡时间为40S；只能建立一个邻居关系 |
+| 环回接口       | 网络类型：P2P（只是华为写个P2P，装个样子的）。就算有工作过程也是装样子的 |
+| NBMA（帧中继） | 网络类型：NBMA。工作方式：需要进行DR和BDR选举；hello时间为30S，死亡时间为120S；可以建立多个邻居关系，只能手工建立邻居关系。 |
+|                | 网络类型：P2MP（没有对应的网络环境，无法由设备自动生成，必须由管理员手工更改）。不需要进行DR和BDR选举（每一台设备都是点到点，所以不需要），hello时间为30S，死亡时间为120S；可以建立多个邻居关系。（解决了NBMA的痛点） |
 
 
 
