@@ -325,13 +325,78 @@ FULL状态---标志着邻接关系的建立。
 *   P2P点到点网络
 
 *   MA多点接入网络
-    	BMA——支持广播的多点接入网络
-
-​	NBMA——不支持广播的多点接入网络
 
 
+​		BMA——支持广播的多点接入网络
 
-以太网--- 因为以太网协议可以组件一个多点的网络环境，所以，不同的节点需要使用不同的MAC地址进行区分和标识
+​		NBMA——不支持广播的多点接入网络
+
+
+
+​	以太网——因为以太网协议可以组件一个多点的网络环境，所以，不同的节点需要使用不同的MAC地址进行区分和标识
+
+
+
+P2P网络——仅能存在两台设备的网络，不需要使用MAC地址也可以正常通信
+
+
+
+
+
+
+
+好，到此为止了！😡
+
+**OSPF在不同的网络环境下的工作方式是不一样的**
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916164645309.png" alt="image-20260916164645309" style="zoom:80%;" />
+
+举上图例子看看
+
+
+
+先查看OSPF接口的状态：
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916164039341.png" alt="image-20260916164039341" style="zoom:67%;" />
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916171705183.png" alt="image-20260916171705183" style="zoom:67%;" />
+
+上面是BMA的链路，下面是PPP的链路
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916172038093.png" alt="image-20260916172038093" style="zoom:67%;" />
+
+
+
+
+
+
+
+PPP接口开销值甚至48（华为设备默认遵循的是E1标准——2.048MBps）
+
+
+
+**顺便一提：Broadcast接口可以和P2P建立邻居关系**
+
+
+
+| 网络类型      | OSPF接口的网络类型和工作方式                                 |
+| ------------- | ------------------------------------------------------------ |
+| BMA（以太网） | 网络类型：Broadcast。工作方式：需要进行DR和BDR选举；hello时间为10S，死亡时间为40S；可以建立多个邻居关系 |
+| P2P（PPP）    | 网络类型：P2P。工作方式：不需要进行DR和BDR选举；hello时间为10S，死亡时间为40S；只能建立一个邻居关系 |
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

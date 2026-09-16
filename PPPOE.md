@@ -1,4 +1,4 @@
-**PPPOE技术**
+**PPPOE技术**（拨号上网）
 
 （PPPover Ethernet，以太承载PPP协议）
 
@@ -38,7 +38,7 @@ PPPoE协议采用C/S方式，将PPP报文封装在以太网帧之内，使PPP帧
 
     ![image-20260807054248110](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260807054248110.png)
 
-    (1）由客户端向服务器端**广播**发送PAD报文，询问PPPoE服务器
+    (1）由客户端向服务器端**广播**发送PADI报文，询问PPPoE服务器
 
     ​	PADI (PPPOE Active Discovery Initiation)
 
@@ -79,6 +79,7 @@ PPPoE协议采用C/S方式，将PPP报文封装在以太网帧之内，使PPP帧
 [PPPOS server-aaa]local-user xuaner password cipher xgz123
 [PPPOS server-aaa]local-user xuaner service-type ppp 
 创建用于拨号验证的用户，服务类型为PPP
+用户名为xuaner，密码为xgz123
 
 [PPPOS server]interface Virtual-Template 1
 [PPPOS server-Virtual-Template1]ip address 100.1.1.2 24
@@ -89,7 +90,7 @@ PPPoE协议采用C/S方式，将PPP报文封装在以太网帧之内，使PPP帧
 
 [PPPOS server]ip pool chi
 [PPPOS server-ip-pool-chi]network 100.1.1.0 mask 24
-配置地址池，哪怕上面先声明用这个池子，我后面再配也不迟
+配置地址池，哪怕上面先声明用这个池子，我现在再配也不迟
 
 [PPPOS server]interface GigabitEthernet 0/0/0
 [PPPOS server-GigabitEthernet0/0/0]pppoe-server bind virtual-template 1
