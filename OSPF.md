@@ -853,6 +853,7 @@ P2P网络——仅能存在两台设备的网络，不需要使用MAC地址也�
 
 相当于R4这个不合法的ABR设备找了合法的ABR设备R2做担保，这么理解
 实际是想让这条虚链路视为在区域0内
+命令是在那个想要穿过的区域敲的
 ```
 
 
@@ -950,7 +951,7 @@ R3被称为ASBR————协议边界/进程边界/AS边界设备————�
 
 
 ```
-[r4-ospf-1limport-route rip 1 cost 2
+[r4-ospf-1]import-route rip 1 cost 2
 设置开销值
 ```
 
@@ -1242,7 +1243,21 @@ R3被称为ASBR————协议边界/进程边界/AS边界设备————�
 
 
 
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260921163916087.png" alt="image-20260921163916087" style="zoom:67%;" />
+
+
+
+
+
 #### 接口认证
+
+```
+[R1-GigabitEthernet0/0/0]ospf authentication-mode md5 1 cipher 123456
+md5加密认证，两端要一样，KID必须相同，就是这个1
+
+[R2-GigabitEthernet0/0/0]ospf authentication-mode md5 1 cipher 123456
+
+```
 
 
 
@@ -1251,6 +1266,15 @@ R3被称为ASBR————协议边界/进程边界/AS边界设备————�
 
 
 #### 区域认证
+
+```
+[R2-ospf-1-area-0.0.0.0]authentication-mode md5 1 cipher 123456
+和接口的一个道理，给一个区域做认证，这样这个区域内所有接口都必须这样
+```
+
+注意：接口认证的优先级更高，且可以覆盖区域配置
+
+另外：接口认证可以对接区域认证
 
 
 
@@ -1262,6 +1286,18 @@ R3被称为ASBR————协议边界/进程边界/AS边界设备————�
 
 
 
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260921193547668.png" alt="image-20260921193547668" style="zoom: 67%;" />
+
+```
+[R1-ospf-1-area-0.0.0.1]vlink-peer 2.2.2.2 md5 1 cipher 123456
+
+
+```
+
+
+
+`[R2-ospf-1-area-0.0.0.1]authentication-mode md5 1 cipher 123456`
+没错，区域认证也能混着虚链路认证，
 
 
 
@@ -1269,8 +1305,7 @@ R3被称为ASBR————协议边界/进程边界/AS边界设备————�
 
 
 
-
-
+注意：以上三种认证本质都一样，
 
 
 
@@ -1282,17 +1317,86 @@ R3被称为ASBR————协议边界/进程边界/AS边界设备————�
 
 
 
-
+可以看上面的优化方法里的汇总
 
 
 
 ### 沉默接口
+
+————如果将一个接口配置成为沉默接口，则该接口将只接受不发送OSPF的数据包（连接用户的网段配置）
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260921202831389.png" alt="image-20260921202831389" style="zoom: 50%;" />
+
+
+
+```
+[R5-ospf-3]silent-interface GigabitEthernet 0/0/0
+在这个区域里沉默这个接口
+```
 
 
 
 
 
 ### 加快收敛
+
+————减少计时器的时间
+
+
+
+
+
+```
+[R2-GigabitEthernet0/0/1]ospf timer hello 5
+
+修改接口的hello时间（死亡时间会跟着动，自动变为hello四倍）
+```
+
+
+
+```
+[R2-GigabitEthernet0/0/1]ospf timer dead 5
+
+修改死亡时间
+```
+
+二者任何一个时间不同，邻居关系都无法建立
+
+
+
+
+
+
+
+Waiting time —— 等待计时器 DR 和 BDR 选举时间计时器，时间和死亡时间同步。
+
+
+
+
+
+
+
+Poll——轮询时间——默认120S——在和关系为DOWN的邻居之间发送hello包的间隔时间。32-NBMA
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260921210825116.png" alt="image-20260921210825116" style="zoom:80%;" />
+
+
+
+
+
+Retransmit--重传时间---5S---.如果在重传时间内没有收到对方回复的确认报文，将重传。
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260921211446840.png" alt="image-20260921211446840" style="zoom:80%;" />
+
+
+
+
+
+Transmit Delay——传输延迟——1S——为了补偿LSA在网络中传递消耗的时间——这个是补偿到LSA老化时间中的。（发送之前在LSA老化时间里面加上传输延迟）
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260921212326507.png" alt="image-20260921212326507" style="zoom:80%;" />
 
 
 
@@ -1301,6 +1405,117 @@ R3被称为ASBR————协议边界/进程边界/AS边界设备————�
 
 
 ### 缺省路由
+
+
+
+-   用 **Type 3 LSA** 承载的缺省路由 → 叫三类缺省
+-   用 **Type 5 LSA** 承载的缺省路由 → 叫五类缺省
+-   用 **Type 7 LSA** 承载的缺省路由 → 叫七类缺省
+
+————三类缺省，五类缺省，七类缺省
+
+
+
+
+
+
+
+#### 三类缺省
+
+三类缺省--只能在特殊区域中自动生成————末梢区域，完全末梢区域，完全的NSSA域
+
+
+
+
+
+
+
+#### 五类缺省
+
+五类缺省————实质是通过配置命冷将缺省路由重发布到OSPF网络中。
+
+```
+[R2-ospf-1]default-route-advertise
+发送路由至这个OSPF进程
+
+[R2-ospf-1]default-route-advertise always 
+强制下发缺省
+```
+
+注意：该命令下发缺省路由时需要保证设备本身具备一条缺省路由才能下发。
+
+
+
+有人可能会问为什么这算5类？仔细想想，这是不是相当于把域外的某个信息传进来了一样，然后用ABR蔓延到了整个OSPF，只不过网段是0.0.0.0/0（就是让本设备扮演 ASBR，把一条 0.0.0.0/0 当作“外部路由”引入 OSPF 进程。）
+
+
+
+
+
+#### 七类缺省
+
+七类缺省---可以通过特殊区域自动生成（NSSA），也可以手工下发。
+
+
+
+手工下发的情况很少：
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260921221704509.png" alt="image-20260921221704509" style="zoom:50%;" />
+
+需要手动指定一个ABR设备（红点）来做7类缺省，因为在这里禁5类
+
+```
+[r0-ospf-1-area-0.0.0.0]nssa default-route-advertise
+需要进入到nssa区域内敲
+```
+
+
+
+
+
+
+
+
+
+### 路由过滤
+
+------------------------------
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260921231258850.png" alt="image-20260921231258850" style="zoom:67%;" />
+
+```
+[R1-ospf-1-area-0.0.0.3]abr-summary 5.5.5.5 255.255.255.255 not-advertise 
+
+三类LSA过滤，过滤了区域3里面R5的环回，这样R2就学不到5.5.5.5的路由了
+```
+
+
+
+
+
+```
+[R4-ospf-1]asbr-summary 100.0.0.0 255.255.255.0 not-advertise 
+
+五类七类LSA过滤，过滤了域外的100.0.0.0/24网段，R3也学不到100.0.0.0了
+```
+
+
+
+
+
+
+
+### 路由控制
+
+------------------
+
+
+
+
+
+
+
+
 
 
 
