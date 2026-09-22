@@ -1,4 +1,4 @@
-# OSPF
+#  OSPF
 
 
 
@@ -1754,13 +1754,91 @@ COST=参考带宽/真实带宽
 
 
 
-SPF算法————I-SPF（改进版）
+SPF算法————**I-SPF**（改进版）
 
 这个算法有意思了，不管是作者本人还是读者，建议都可以手操试一试
 
 
 
 
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922162113856.png" alt="image-20260922162113856" style="zoom: 50%;" />
+
+第一轮，目前是这样：（路径指的是上一个位置）
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922162357957.png" alt="image-20260922162357957" style="zoom:67%;" />
+
+第二轮，我们顺着这个表上距离最小值继续往下
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922162652970.png" alt="image-20260922162652970" style="zoom: 67%;" />
+
+第三轮，我们选没标红的距离最小值继续往下
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922162832566.png" alt="image-20260922162832566" style="zoom:67%;" />
+
+第四轮，发现剩下两个6，那就随便选一个
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922163142983.png" alt="image-20260922163142983" style="zoom:67%;" />
+
+第五轮，接着选最小距离往下推，发现D和E都能到F，就比较他们各自到F的距离，留下小的
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922163355532.png" alt="image-20260922163355532" style="zoom:67%;" />
+
+第六轮，两个9选一个推
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922163601889.png" alt="image-20260922163601889" style="zoom:67%;" />
+
+第七轮，发现G也能到H，而且距离更短，就选G这条路径
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922163704450.png" alt="image-20260922163704450" style="zoom:67%;" />
+
+至此，已经可以通过这个表画出树了
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922164208165.png" alt="image-20260922164208165" style="zoom:33%;" />
+
+
+
+
+
+
+
+
+
+
+
+之后我们再了解下，图是怎么画出来的
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922180136896.png" alt="image-20260922180136896" style="zoom:80%;" />
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922180156061.png" alt="image-20260922180156061" style="zoom:80%;" />
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922180300623.png" alt="image-20260922180300623" style="zoom:80%;" />
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922180638239.png" alt="image-20260922180638239" style="zoom:67%;" />
+
+
+
+
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922201008260.png" alt="image-20260922201008260" style="zoom:80%;" />
+
+此拓扑用图画出来是这样：（真是思科的图，所以环回接口开销值为1）
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922201116059.png" alt="image-20260922201116059" style="zoom:80%;" />
+
+
+
+再运用我们之前讲过的I-STP算法：
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260922201419007.png" alt="image-20260922201419007" style="zoom: 67%;" />
+
+
+
+好，OSPF你已经全部学完了，不过你仍然会回来看的：
+
+|
 
 
 
