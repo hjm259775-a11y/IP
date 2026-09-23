@@ -125,9 +125,87 @@ UP状态下：
 
 
 
+
+
+## BFD数据包
+
+
+
+
+
+### 组播
+
+注意：BFD传输层使用的是UDP协议，目标端口号为3784，源端口号随机
+
+单跳环境下可以使用组播发送BFD报文，默认的组播地址为224.0.0.184，会使用对应的组播MAC地址。
+
+
+
+源端口：随机，目标端口：3784
+
+源IP：自己接口IP，目标IP（组播）：224.0.0.184
+
+源MAC：自己MAC，目标MAC（组播）：对应的组播MAC地址
+
+
+
+
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260923104407504.png" alt="image-20260923104407504" style="zoom:80%;" />
+
+*   最小 BFD 发送间隔
+
+​	**图中数值**：1000 ms (1000000 us)
+
+​	**含义**：这是本端设备向对端设备发送 BFD 控制报文时，期望使用的最小时间间隔。也就是本端“我最快能每隔 1000 毫秒发一个包”。
+
+*   最小 BFD 接收间隔
+
+​	**图中数值**：1000 ms (1000000 us)
+
+​	**含义**：这是本端设备能够支持的、接收对端 BFD 控制报文的最小时间间隔。意思是“我要求你（对端）发给我的包，间隔不能小于 1000 毫秒，否则我可能处理不过来”
+
+
+
+
+
+
+
+### 单播
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## BFD配置
 
 
+
+
+
+### 单跳检测场景
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260923110100543.png" alt="image-20260923110100543" style="zoom:67%;" />
 
 
 
@@ -179,8 +257,54 @@ UP状态下：
 
 
 
+查看其配置
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260923102945146.png" alt="image-20260923102945146" style="zoom:67%;" />
+
+
+
+
+
+
+
+
+
+### 多跳检测场景
+
 2，多跳检测场景————多跳BFD是两边设备之间建立的会话，但这两台设备不一定是直连的，中间可以隔着任意多台三层设备。
 
+​	多跳只能采用IP地址
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260923110039173.png" alt="image-20260923110039173" style="zoom:50%;" />
+
+
+
+```
+[R6]bfd
+[R6-bfd]qu
+[R6]
+
+[R6]bfd xgz bind peer-ip 45.0.0.4 
+这次用IP地址建立单播
+
+[R6-bfd-session-xgz]discriminator local 10
+[R6-bfd-session-xgz]discriminator remote 20
+
+[R6-bfd-session-xgz]commit
+
+```
+
+
+
+```
+[R4]BFD
+[R4-bfd]qu
+[R4]
+[R4]bfd myn bind peer-ip 56.0.0.6
+[R4-bfd-session-myn]discriminator local 20
+[R4-bfd-session-myn]discriminator remote 10
+[R4-bfd-session-myn]commit
+```
 
 
 
@@ -190,6 +314,177 @@ UP状态下：
 
 
 
+
+
+### 自动配置
+
+**自动配置，也就是动态会话**
+
+```
+[R4]bfd
+[R4-bfd]qu
+[R4]
+
+[R4]bfd vv bind peer-ip 56.0.0.6 source-ip 45.0.0.4 auto 
+```
+
+
+
+````
+[R6]bfd
+[R6-bfd]qu
+[R6]
+
+[R6]bfd ww bind peer-ip 45.0.0.4 source-ip 56.0.0.6 auto 
+````
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260923112511752.png" alt="image-20260923112511752" style="zoom:67%;" />
+
+
+
+
+
+
+
+
+
+## BFD的检测模式
+
+
+
+### 异步模式
+
+——————两台设备均发送BFD报文分别进行保活（适用于二者路由器差不多配置的情况下使用）
+
+
+
+
+
+### 回声模式
+
+
+
+（单跳环境下使用）（适用于二者路由器配置性能相差较大的情况下使用，不会被配置低的设备拖累）
+
+————————发送不是普通的BFD报文，而是BFD ECHO报文。
+
+
+
+​	源IP：自己，目标IP：自己（这个报文比较特殊，能让这个包发出去）
+
+​	源MAC：自己，目标MAC：对端
+
+
+
+这样发给对端，对端解二层之后看目标IP，重新封装二层后又转发回去，自己收到了自己发的包，就能确定保活了，并且这个方法不受对方性能约束
+
+
+
+​	被动回声模式————在两台设备启动异步模式的基础上，将发送的报文替换成为ECHO报文。
+
+​	单臂回声模式————仅一台设备激活BFD，对端设备甚至都可以不激活BFD，
+
+​	`[R4]bfd hhh bind peer-ip 56.0.0.6 interface GigabitEthernet 0/0/0 source-ip 45.0.0.4 one-arm-echo`这是单臂回声模式
+
+
+
+
+
+
+
+
+
+
+
+## BFD和静态配置
+
+
+
+ 
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260923152125108.png" alt="image-20260923152125108" style="zoom:67%;" />
+
+```
+[R1]bfd
+[R1-bfd]qu
+[R1]
+
+
+[R1]ip route-static 0.0.0.0 0 12.0.0.2 track bfd-session xgz
+再配完BFD后，配置静态路由时，需要追踪名字为xgz的bfd会话
+```
+
+
+
+
+
+
+
+
+
+## BFD和OSPF配置
+
+
+
+```
+[R1]bfd
+[R1-bfd]qu
+[R1]
+
+
+[r1-ospf-1]bfd all-interfaces enable
+让R1在该进程下所有运行 OSPF 的接口上，动态建立 BFD 会话（OSPF里面每个设备都敲一遍）
+```
+
+
+
+
+
+
+
+
+
+## BFD和VRRP配置
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260923161923606.png" alt="image-20260923161923606" style="zoom:67%;" />
+
+主设备是R1，备用设备是R2
+
+配置完VRRP之后
+
+```
+[R1]bfd aaa bind peer-ip 192.168.1.2 source-ip 192.168.1.1 auto
+
+[R2]bfd aaa bind peer-ip 192.168.1.1 source-ip 192.168.1.2 auto
+
+让R1和R2下面两个接口建立BFD会话
+```
+
+
+
+```
+[rl-bfd-session-aalmin-rx-interval 100
+[rl-bfd-session-aa]min-tx-interval 100
+
+[r2-bfd-session-aalmin-rx-interval 100
+[r2-bfd-session-aa]min-tx-interval 100
+
+修改接收发送间隔为100ms
+```
+
+
+
+
+
+```
+[R1-GigabitEthernet0/0/0]vrrp vrid 10 track bfd-session session-name aaa increased 10
+
+让接口视图下让VRRP 10去追踪名字是aaa的BFD会话，当 BFD 会话 down 时，则本接口优先级加10（火速抢占网关）
+```
 
 
 
