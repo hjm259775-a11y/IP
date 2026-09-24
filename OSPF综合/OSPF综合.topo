@@ -6,12 +6,6 @@
                 <interface sztype="Ethernet" interfacename="GE" count="24" />
             </slot>
         </dev>
-        <dev id="D15BC388-F211-4ddc-BEDC-2D8435B34DE1" name="AR2" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-47-76-0A" com_port="2001" bootmode="0" cx="63.000000" cy="57.000000" edit_left="90" edit_top="105">
-            <slot number="slot17" isMainBoard="1">
-                <interface sztype="Ethernet" interfacename="GE" count="1" />
-                <interface sztype="Ethernet" interfacename="GE" count="2" />
-            </slot>
-        </dev>
         <dev id="BC962499-E440-48d8-8418-5ECEC3242025" name="AR3" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-9F-4D-70" com_port="2002" bootmode="0" cx="63.000000" cy="195.000000" edit_left="90" edit_top="249">
             <slot number="slot17" isMainBoard="1">
                 <interface sztype="Ethernet" interfacename="GE" count="1" />
@@ -19,6 +13,30 @@
             </slot>
         </dev>
         <dev id="20C1FB31-C97E-46eb-B6DB-8A81536B766D" name="AR4" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-DB-20-E3" com_port="2003" bootmode="0" cx="300.000000" cy="122.000000" edit_left="327" edit_top="176">
+            <slot number="slot17" isMainBoard="1">
+                <interface sztype="Ethernet" interfacename="GE" count="1" />
+                <interface sztype="Ethernet" interfacename="GE" count="2" />
+            </slot>
+        </dev>
+        <dev id="16AD5B24-8253-432e-9094-11727C6747A1" name="AR10" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-D1-43-BB" com_port="2010" bootmode="0" cx="750.000000" cy="119.000000" edit_left="777" edit_top="173">
+            <slot number="slot17" isMainBoard="1">
+                <interface sztype="Ethernet" interfacename="GE" count="1" />
+                <interface sztype="Ethernet" interfacename="GE" count="2" />
+            </slot>
+        </dev>
+        <dev id="FBF16BCA-7D1D-47aa-BBBE-949E34A9277E" name="AR9" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-1D-4A-2A" com_port="2009" bootmode="0" cx="628.000000" cy="119.000000" edit_left="655" edit_top="173">
+            <slot number="slot17" isMainBoard="1">
+                <interface sztype="Ethernet" interfacename="GE" count="1" />
+                <interface sztype="Ethernet" interfacename="GE" count="2" />
+            </slot>
+        </dev>
+        <dev id="699CD644-E32C-465c-B944-E011297F33ED" name="AR7" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-B8-6D-28" com_port="2007" bootmode="0" cx="458.000000" cy="344.000000" edit_left="485" edit_top="398">
+            <slot number="slot17" isMainBoard="1">
+                <interface sztype="Ethernet" interfacename="GE" count="1" />
+                <interface sztype="Ethernet" interfacename="GE" count="2" />
+            </slot>
+        </dev>
+        <dev id="E1933709-0724-48a5-84EB-F7C49538DFA0" name="AR6" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-92-4B-3F" com_port="2006" bootmode="0" cx="458.000000" cy="237.000000" edit_left="485" edit_top="291">
             <slot number="slot17" isMainBoard="1">
                 <interface sztype="Ethernet" interfacename="GE" count="1" />
                 <interface sztype="Ethernet" interfacename="GE" count="2" />
@@ -32,37 +50,19 @@
             </slot>
             <slot isMainBoard="0" id="3" type="9" />
         </dev>
-        <dev id="76624A61-9F7A-47ff-9E27-7818584EDDDF" name="ISP" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-86-20-2F" com_port="2000" bootmode="0" cx="497.000000" cy="34.000000" edit_left="524" edit_top="88">
+        <dev id="76624A61-9F7A-47ff-9E27-7818584EDDDF" name="ISP" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-86-20-2F" com_port="2000" bootmode="0" cx="529.000000" cy="6.000000" edit_left="556" edit_top="60">
             <slot number="slot17" isMainBoard="1">
                 <interface sztype="Ethernet" interfacename="GE" count="1" />
                 <interface sztype="Ethernet" interfacename="GE" count="2" />
             </slot>
         </dev>
-        <dev id="FBF16BCA-7D1D-47aa-BBBE-949E34A9277E" name="AR9" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-1D-4A-2A" com_port="2009" bootmode="0" cx="628.000000" cy="119.000000" edit_left="655" edit_top="173">
-            <slot number="slot17" isMainBoard="1">
-                <interface sztype="Ethernet" interfacename="GE" count="1" />
-                <interface sztype="Ethernet" interfacename="GE" count="2" />
-            </slot>
-        </dev>
-        <dev id="16AD5B24-8253-432e-9094-11727C6747A1" name="AR10" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-D1-43-BB" com_port="2010" bootmode="0" cx="750.000000" cy="119.000000" edit_left="777" edit_top="173">
+        <dev id="D15BC388-F211-4ddc-BEDC-2D8435B34DE1" name="AR2" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-47-76-0A" com_port="2001" bootmode="0" cx="63.000000" cy="57.000000" edit_left="90" edit_top="105">
             <slot number="slot17" isMainBoard="1">
                 <interface sztype="Ethernet" interfacename="GE" count="1" />
                 <interface sztype="Ethernet" interfacename="GE" count="2" />
             </slot>
         </dev>
         <dev id="460F52C8-AC1D-4a83-B13D-888FDB122F28" name="AR11" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-4E-49-45" com_port="2011" bootmode="0" cx="872.000000" cy="119.000000" edit_left="899" edit_top="173">
-            <slot number="slot17" isMainBoard="1">
-                <interface sztype="Ethernet" interfacename="GE" count="1" />
-                <interface sztype="Ethernet" interfacename="GE" count="2" />
-            </slot>
-        </dev>
-        <dev id="E1933709-0724-48a5-84EB-F7C49538DFA0" name="AR6" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-92-4B-3F" com_port="2006" bootmode="0" cx="458.000000" cy="237.000000" edit_left="485" edit_top="291">
-            <slot number="slot17" isMainBoard="1">
-                <interface sztype="Ethernet" interfacename="GE" count="1" />
-                <interface sztype="Ethernet" interfacename="GE" count="2" />
-            </slot>
-        </dev>
-        <dev id="699CD644-E32C-465c-B944-E011297F33ED" name="AR7" poe="0" model="AR2220" settings="" system_mac="00-E0-FC-B8-6D-28" com_port="2007" bootmode="0" cx="458.000000" cy="344.000000" edit_left="485" edit_top="398">
             <slot number="slot17" isMainBoard="1">
                 <interface sztype="Ethernet" interfacename="GE" count="1" />
                 <interface sztype="Ethernet" interfacename="GE" count="2" />
@@ -104,7 +104,7 @@
             <interfacePair lineName="Copper" srcIndex="1" srcBoundRectIsMoved="1" srcBoundRect_X="370.183777" srcBoundRect_Y="149.000000" srcOffset_X="-17.000000" srcOffset_Y="9.000000" tarIndex="1" tarBoundRectIsMoved="1" tarBoundRect_X="441.816223" tarBoundRect_Y="149.000000" tarOffset_X="-29.000000" tarOffset_Y="-20.000000" />
         </line>
         <line srcDeviceID="76624A61-9F7A-47ff-9E27-7818584EDDDF" destDeviceID="583C44B2-3E9D-49c9-A8DD-7C6DD0F140AD">
-            <interfacePair lineName="Copper" srcIndex="0" srcBoundRectIsMoved="1" srcBoundRect_X="506.503052" srcBoundRect_Y="100.480301" srcOffset_X="-45.000000" srcOffset_Y="-20.000000" tarIndex="0" tarBoundRectIsMoved="1" tarBoundRect_X="502.496948" tarBoundRect_Y="109.519699" tarOffset_X="2.000000" tarOffset_Y="-3.000000" />
+            <interfacePair lineName="Copper" srcIndex="0" srcBoundRectIsMoved="1" srcBoundRect_X="533.456116" srcBoundRect_Y="69.832214" srcOffset_X="-36.000000" srcOffset_Y="-34.000000" tarIndex="0" tarBoundRectIsMoved="1" tarBoundRect_X="507.543854" tarBoundRect_Y="112.167786" tarOffset_X="2.000000" tarOffset_Y="-3.000000" />
         </line>
         <line srcDeviceID="583C44B2-3E9D-49c9-A8DD-7C6DD0F140AD" destDeviceID="E1933709-0724-48a5-84EB-F7C49538DFA0">
             <interfacePair lineName="Copper" srcIndex="3" srcBoundRectIsMoved="1" srcBoundRect_X="485.000000" srcBoundRect_Y="192.183762" srcOffset_X="-51.000000" srcOffset_Y="0.000000" tarIndex="2" tarBoundRectIsMoved="0" tarBoundRect_X="485.000000" tarBoundRect_Y="220.816238" tarOffset_X="0.000000" tarOffset_Y="0.000000" />
@@ -121,8 +121,8 @@
     </lines>
     <shapes>
         <shape type="1" filloption="1" color="8454143" upleftcorner="6,59" width="323" height="208" startpt="0,0" endpt="0,0" borderStyle="0" borderWidth="1" />
-        <shape type="1" filloption="1" color="16777088" upleftcorner="331,62" width="316" height="204" startpt="0,0" endpt="0,0" borderStyle="0" borderWidth="1" />
-        <shape type="1" filloption="1" color="12615935" upleftcorner="651,62" width="249" height="203" startpt="0,0" endpt="0,0" borderStyle="0" borderWidth="1" />
+        <shape type="1" filloption="1" color="16777088" upleftcorner="331,104" width="316" height="162" startpt="0,0" endpt="0,0" borderStyle="0" borderWidth="1" />
+        <shape type="1" filloption="1" color="12615935" upleftcorner="651,99" width="249" height="166" startpt="0,0" endpt="0,0" borderStyle="0" borderWidth="1" />
         <shape type="1" filloption="1" color="8421631" upleftcorner="331,266" width="314" height="215" startpt="0,0" endpt="0,0" borderStyle="0" borderWidth="1" />
         <shape type="1" filloption="1" color="4227327" upleftcorner="333,480" width="310" height="165" startpt="0,0" endpt="0,0" borderStyle="0" borderWidth="1" />
         <shape type="2" filloption="1" color="16744448" upleftcorner="913,40" width="143" height="210" startpt="0,0" endpt="0,0" borderStyle="0" borderWidth="1" />
@@ -137,16 +137,16 @@
         <shape type="0" filloption="1" color="0" upleftcorner="0,0" width="0" height="0" startpt="506,567" endpt="532,566" borderStyle="0" borderWidth="10" />
     </shapes>
     <txttips>
-        <txttip left="650" top="332" right="1054" bottom="411" content="1，R5为ISP，其上只能配置IP地址；R4作为企业边界路由器&#x0D;&#x0A;2，繁个oSPF环境1P基于172.16.0.0/16划分；&#x0D;&#x0A;3，所有设备均可访问ISP的环回：&#x0D;&#x0A;4，减少LsA的更新量，加快收敛，保障更新安全：&#x0D;&#x0A;5，全网可达" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="650" top="332" right="1047" bottom="411" content="1，R5为ISP，其上只能配置IP地址；R4作为企业边界路由器&#x0D;&#x0A;2，繁个oSPF环境1P基于172.16.0.0/16划分；&#x0D;&#x0A;3，所有设备均可访问ISP的环回：&#x0D;&#x0A;4，减少LsA的更新量，加快收敛，保障更新安全：&#x0D;&#x0A;5，全网可达" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="962" top="48" right="989" bottom="65" content="RIP" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
-        <txttip left="177" top="78" right="226" bottom="95" content="Area 1" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
-        <txttip left="378" top="87" right="427" bottom="104" content="Area 0" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
-        <txttip left="673" top="82" right="722" bottom="99" content="Area 2" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="216" top="220" right="265" bottom="237" content="Area 1" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="362" top="237" right="411" bottom="254" content="Area 0" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="680" top="217" right="729" bottom="234" content="Area 2" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="352" top="344" right="401" bottom="361" content="Area 3" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="355" top="539" right="404" bottom="556" content="Area 4" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
-        <txttip left="353" top="72" right="455" bottom="89" content="172.16.0.0/19" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
-        <txttip left="144" top="62" right="254" bottom="79" content="172.16.32.0/19" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
-        <txttip left="656" top="67" right="766" bottom="84" content="172.16.64.0/19" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="334" top="222" right="436" bottom="239" content="172.16.0.0/19" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="178" top="204" right="288" bottom="221" content="172.16.32.0/19" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="668" top="203" right="778" bottom="220" content="172.16.64.0/19" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="344" top="363" right="454" bottom="380" content="172.16.96.0/19" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="343" top="517" right="460" bottom="534" content="172.16.128.0/19" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="926" top="88" right="1043" bottom="105" content="172.16.160.0/19" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
@@ -154,7 +154,7 @@
         <txttip left="81" top="179" right="138" bottom="196" content="32.3/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="79" top="118" right="136" bottom="135" content="32.2/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="262" top="95" right="319" bottom="112" content="35.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
-        <txttip left="2" top="59" right="59" bottom="76" content="36.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="-3" top="73" right="54" bottom="90" content="36.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="0" top="198" right="57" bottom="215" content="37.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="379" top="116" right="428" bottom="133" content="1.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="558" top="123" right="607" bottom="140" content="2.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
@@ -165,9 +165,9 @@
         <txttip left="535" top="528" right="599" bottom="545" content="128.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="522" top="494" right="586" bottom="511" content="129.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="530" top="559" right="594" bottom="576" content="130.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
-        <txttip left="683" top="108" right="740" bottom="125" content="64.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
-        <txttip left="753" top="87" right="810" bottom="104" content="65.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
-        <txttip left="813" top="106" right="870" bottom="123" content="66.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="672" top="112" right="729" bottom="129" content="64.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="749" top="98" right="806" bottom="115" content="65.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
+        <txttip left="816" top="112" right="873" bottom="129" content="66.0/24" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="942" top="121" right="1006" bottom="138" content="160.0/20" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
         <txttip left="942" top="152" right="1006" bottom="169" content="176.0/20" fontname="Consolas" fontstyle="0" editsize="100" txtcolor="-16777216" txtbkcolor="-7278960" charset="1" />
     </txttips>
