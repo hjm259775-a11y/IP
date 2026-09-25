@@ -16,7 +16,12 @@
 
 但是PPP协议可以给用户自动分配公网IP地址，所以需要在以太网的基础之上承载PPP（可能有人会问为什么不用DHCP，因为性价比不高☝️🤓）。
 
+PPP-点到点协议
+	1，兼容性强---只要支持全双工的串线，就都可以使用PPP协议
 
+​	2，可移植性强
+
+​	3，可以进行认证和计费，授权
 
 
 
@@ -26,7 +31,7 @@ PPPoE协议采用C/S方式，将PPP报文封装在以太网帧之内，使PPP帧
 
 ![image-20260807052254287](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260807052254287.png)
 
-
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260925211742203.png" alt="image-20260925211742203" style="zoom:67%;" />
 
 
 
@@ -37,6 +42,8 @@ PPPoE协议采用C/S方式，将PPP报文封装在以太网帧之内，使PPP帧
 *   1、Discovery阶段：协商PPPoE的seession-ID，用来区分不同的逻辑点
 
     ![image-20260807054248110](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260807054248110.png)
+
+    
 
     (1）由客户端向服务器端**广播**发送PADI报文，询问PPPoE服务器
 
@@ -54,10 +61,87 @@ PPPoE协议采用C/S方式，将PPP报文封装在以太网帧之内，使PPP帧
 
     ​	PADS （PPPOE Active Discovery Session-Confirmation包含session ID信息)
 
+
+
+
+
 *   2、ppp session协商阶段：在PPPoE会话中进行ppp协商
-    	LCP协商
-    	身份验证
-    	NCP协商
+
+    ​	LCP协商————完成链路建立的协议，有三步：
+
+    
+
+1，**LCP建立**--- 通过协商参数来完成链路的建立
+
+​		协商什么呢：
+
+​		1，MRU---PPP帧中携带的最大数据量--1500字节
+
+​		2，是否需要认证以及使用什么样的认证方法
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260925212948141.png" alt="image-20260925212948141" style="zoom:50%;" />
+
+
+
+
+
+
+
+**身份验证**————可选
+
+​	PAP————直接通过明文传递认证信息
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260925213819948.png" alt="image-20260925213819948" style="zoom:50%;" />
+
+
+
+
+
+
+
+​	CHAP---挑战握手协议---通过比对摘要值的方式进行认证
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260925214201172.png" alt="image-20260925214201172" style="zoom:50%;" />
+
+
+
+
+
+
+
+**NCP协商**————网络层协议协商阶段，（注意，因为网络层使用的协议有很多个，所以，PPP在进行网络层协商时，使用的是不同的NCP协议，NCP协议是一堆协议的集合）（如果网络层使用的是IP协议，则使用IPCP协议进行NCP协商）
+
+
+
+协商什么呢：
+
+​	1，IP报文的压缩方式
+
+​	2，IP地址（其实是种认证）
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260925220029553.png" alt="image-20260925220029553" style="zoom:50%;" />
+
+注意：一旦认可了对方的IP地址，则自身设备上会生成一条指向该地址的主机路由。
+
+
+
+
+
+
+
+
+
+
+
+获取IP地址：
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260925220506023.png" alt="image-20260925220506023" style="zoom:50%;" />
+
+
+
+
+
+
 
 +   3、PPPOE会话终结，PPPoE断开
     当PPPoE客户端希望关闭连接时，会向PPPoE服务器端发送一个PADT（PPPoEActive DiscoVery Terminate）报文，用于关闭连接。同样，如果PPPoE服务器端希望关闭连接时，也会向PPPoE客户端发送一个PADT报文。
@@ -94,7 +178,7 @@ PPPoE协议采用C/S方式，将PPP报文封装在以太网帧之内，使PPP帧
 
 [PPPOS server]interface GigabitEthernet 0/0/0
 [PPPOS server-GigabitEthernet0/0/0]pppoe-server bind virtual-template 1
-将virtual-template 1与GigabitEthernet 0/0/0做绑定，在以太网接口启动PPPoE·Server功能，毕竟数据都是物理接口传过来的
+将virtual-template 1与GigabitEthernet 0/0/0做绑定，在以太网接口启动PPPoE-Server功能，毕竟数据都是物理接口传过来的
 ```
 
 

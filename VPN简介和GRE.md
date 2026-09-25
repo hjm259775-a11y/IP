@@ -263,13 +263,6 @@ R2看到内网IP，==R2查看路由表==，发给2.0网段
 [R2-Tunnel0/0/0]ip address 192.168.3.1 24
 设置隧道IP，注意两边隧道IP要在同一个网段
 
-[R2-Tunnel0/0/0]tunnel-protocol ?
-  gre        Generic Routing Encapsulation
-  ipsec      IPSEC Encapsulation
-  ipv4-ipv6  IP over IPv6 encapsulation
-  ipv6-ipv4  IPv6 over IP encapsulation
-  mpls       MPLS Encapsulation
-  none       Null Encapsulation
 [R2-Tunnel0/0/0]tunnel-protocol gre
 设置类型为GRE VPN
 
