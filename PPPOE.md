@@ -61,6 +61,8 @@ PPPoE协议采用C/S方式，将PPP报文封装在以太网帧之内，使PPP帧
 
     ​	PADS （PPPOE Active Discovery Session-Confirmation包含session ID信息)
 
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260925230027533.png" alt="image-20260925230027533" style="zoom:67%;" />
+
 
 
 
