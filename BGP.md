@@ -280,6 +280,85 @@ Established——————建立完成阶段————标志着对等体关
 
 
 
+
+
+## BGP的选路原则
+
+
+
+![image-20260928214444459](C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928214444459.png)
+
+0，丢弃所有不可用的路由
+
+1，优选Preferred-Value属性值最大的路由。
+
+2，优选Local_Preference属性值最大的路由。
+
+3，本地始发的BGP路由优于从其他对等体学习到的路由，本地始发的路由优先级：优选手动聚合>自动聚合>network>import>从对等体学到的。
+
+4，优选AS_Path属性最短的路由。
+
+5，优选Origin属性最优的路由。Origin属性值按优先级从高到低的排列是：IGP、EGP及Incomplete。
+
+6，优选MED属性值最小的路由。
+
+7，优选从EBGP对等体学来的路由（EBGP路由优先级高于IBGP路由）。
+
+8，优选到Next_Hop的IGP度量值最小的路由。
+
+9，优选Cluster_List最短的路由。
+
+10，优选Router ID（Orginator_ID）最小的设备通告的路由。
+
+11，优选具有最小IP地址的对等体通告的路由。
+
+
+
+
+
+```
+[r4-bgp]display bgp routing-table 1.1.1.0 24
+
+查看1.1.1.0/24
+```
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928223344963.png" alt="image-20260928223344963" style="zoom:67%;" />
+
+
+
+| 属性 | 传播范围       | 默认值       | 评判标准 |
+| ---- | -------------- | ------------ | -------- |
+| PV   | 不传递（本地） | 0（0-65535） | 越大越优 |
+
+
+
+
+
+1，优选PV值最大的路由
+	PV属性是本地干涉选路最方便的属性————PV属性不能传递（华为私有属性）
+
+`[r4-bgp]peer 3.3.3.3 preferred-value 100`仅具有本地意义，将3.3.3.3传来的路由的PV值改为100
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## BGP路由黑洞
 
 
@@ -367,13 +446,147 @@ R2把路由发给R4和R3，R3和R4之间不会互相转发这条路由
 那这不炸了，IBGP对等体的水平分割相当于将IBGP对等体之间传递路由控制在1跳之内，可能造成路由的传递障碍。
 
 
-​	所以：
+​	所以用什么方法解决：
 
 ​		1，只能使用全连的IBGP对等体（额外造成资源浪费，导致网络拓展性降低）
 
+### 路由反射器
+
 ​		2，路由反射器
 
+————————RR
+
+​		可以将某设备配置成为RR，则其在满足一定条件下，可以将收到的路由反射给其他设备
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928111758022.png" alt="image-20260928111758022" style="zoom:50%;" />
+
+
+在指定一台设备成为路由反射器的同时，需要再指定一个或多个IBGP对等体作为他的客户，RR和客户之间形成的整体称为反射簇。（用RR的RID作为反射簇的簇ID）
+
+
+
+反射规则：（非客户和非客户之间不传）
+
+​	1，所有客户发的路由信息，可以反射给所有的客户以及非客户
+
+​	2，从非客户处学来的路由，则可以反射给自已所有的客户。
+
+​	3，只有可用且优的路由会被反射
+
+
+
+
+
+注意：路由反射器实质上是打破了IBGP水平分割机制，所以，可能出现环路，需要设置防环机制————
+
+——————originator_id（起源者ID），cluster_list（簇列表）
+
+oridinator_id（起源者1D）————标识一条反射的路由的始发的设备。（图中R3给R4反射的起源者ID会写2.2.2.2）
+
+​	当一个设备收到的路由中没有起源者ID，则他在反射该路由时会将发送者的RID作为起源者ID携带在反射的路由条目中，之后的设备如果发现起源者ID中存在内容，则反射路由将不改变起源者ID，当一台设备收到一条反射的路由时，里面的起源者ID是自己本地的RID，则将不学习该路由，防止路由的回传，出现环路。（就是转发时没有起源者ID，就把发送者的RID贴上去，看到里面有起源者ID就不要动，收到路由时看到起源者ID是自己就别学）
+
+
+
+
+
+——————cluster_list（簇列表）————当一条反射的路由离开一个反射簇时，需要将该反射簇的簇ID添加到cluster list中
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928115136744.png" alt="image-20260928115136744" style="zoom:67%;" />
+
+如图，起源者ID为4.4.4.4，经过R1进行反射再回到R1，也会出环，
+
+所以需要簇列表，每次离开一个簇列表，都把簇ID写在列表里面，这样就算R1收到反射回来的也能在簇列表里面看到自己的簇ID，从而不选用该路由信息
+
+
+
+评价：多出来两个属性，就为了不改变原本的As-by-As的属性啊✋😭✋（当然，只在As内部防环使用，发送给自己的EBGP对等体时，不需要携带）
+
+```
+[r3-bgp]peer 2.2.2.2 reflect-client
+
+让IP地址为2.2.2.2的成为自己的客户
+```
+
+
+
+
+
+
+
+
+
+### 联邦
+
 ​		3，联邦
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928185216499.png" alt="image-20260928185216499" style="zoom: 67%;" />
+
+AS区域外的BGP就老老实实正常配就行了`[R1-bgp]peer 12.0.0.2 as-number 2`
+
+
+
+
+
+```
+[R2]bgp 64512————————————————————————————————————————————————————————————————————————————————————————
+[R2-bgp]router-id 2.2.2.2
+[R2-bgp]confederation id 2——————————————————————————————————————————————————————————————————————————
+联邦内的需要用内部的as号，同时还需要声明自己的As大号
+
+[R2-bgp]peer 12.0.0.1 as-number 1
+
+[R2-bgp]peer 3.3.3.3 as-number 64512
+[R2-bgp]peer 3.3.3.3 connect-interface LoopBack 0
+[R2-bgp]peer 3.3.3.3 next-hop-local
+
+
+```
+
+
+
+
+
+
+
+```
+[R3]bgp 64512————————————————————————————————————————————————————————————————————————————————————
+[R3-bgp]router-id 3.3.3.3
+[R3-bgp]confederation id 2————————————————————————————————————————————————————————————————————————
+[R3-bgp]peer 2.2.2.2 as-number 64512
+[R3-bgp]peer 2.2.2.2 connect-interface LoopBack 0
+[R3-bgp]peer 2.2.2.2 next-hop-local
+
+
+
+
+[R3-bgp]confederation peer-as 64513——————————————————————————————————————————————————————————————————————
+只有在建立联邦的EBGP对等体的设备上，需要声明联邦对端的AS
+
+[R3-bgp]peer 4.4.4.4 as-number 64513
+[R3-bgp]peer 4.4.4.4 connect-interface LoopBack 0
+[R3-bgp]peer 4.4.4.4 ebgp-max-hop 20————————————————————————————————————————————————————————————————————————
+因为联邦的EBGP需要遵循EBGP对等体的传递原则，所以需要将TTL值改大
+```
+
+
+
+就是个思路问题，随机应变就好，需要留意的是需要写自己的小as和大As，要是本设备连接其他联邦，需要写对端的小as，并且需要调整TTL值
+
+
+
+注意：联邦也打破了IBGP的水平分割，所以，可能会造成环路问题，它使用EBGP的水平分割，AS_PATH中携带联邦的AS号进行防环，只不过使用小括号括起来，在进行防环时，路由将不会回传（**联盟内 EBGP 用 AS_PATH 防环，子 AS 号用小括号括起来。路由器收到路由时，如果 AS_PATH 里有自己的子 AS 号，就丢弃不回传。对外只显示联盟 ID，隐藏内部子 AS。**）
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928213758164.png" alt="image-20260928213758164" style="zoom:67%;" />
+
+
+
+
+
+
 
 
 
@@ -382,6 +595,10 @@ R2把路由发给R4和R3，R3和R4之间不会互相转发这条路由
 ## BGP的基础配置
 
 
+
+
+
+### 建邻
 
 <img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260927191807378.png" alt="image-20260927191807378" style="zoom:80%;" />
 
@@ -505,9 +722,11 @@ EBGP对等体的非直连建邻
 
 
 
+### 发布路由
 
 
 
+#### network发布
 
 ```
 通过network发布路由信息
@@ -531,7 +750,17 @@ EBGP对等体的非直连建邻
 
 ​	I————代表该路由是从自己IBGP对等体处学来的。
 
-​		我们知道，路由信息在AS内部会保持属性不变，但是这样里面的路由器就无法到达边界IBGP的路由，这条命令`[R2-bgp]peer 3.3.3.3 next-hop-local`可以将发给3.3.3.3IP的数据包中的下一跳改为自己本地接口的地址，从而让AS里面的知道该怎么走
+​		我们知道，路由信息在AS内部会保持属性不变，但是这样里面的路由器就无法拥有到达边界IBGP的路由，这条命令`[R2-bgp]peer 3.3.3.3 next-hop-local`可以将发给3.3.3.3IP的数据包中的下一跳改为自己本地接口的地址，从而让AS里面的知道该怎么走
+
+​	OGN————起源码——I——所有通过network发布的路由，起源码都是I
+
+​					    e ---所有通过EGP协议导入到BGP中的路由，起源码为e
+
+​					    ？---所有通过重发布导入的路由（其实是以上两种方法之外），起源码都是？
+
+​	Path————As-Path————就是之前防环的链表
+
+​	S --- suppressed ———— 抑制————自动聚合后将自动抑制明细路由，不在传递给自己的邻居。（因为有汇总被压下去了）
 
 
 
@@ -553,12 +782,133 @@ EBGP对等体的非直连建邻
 
 
 
+#### 重发布
+
+```
+通过import来批量发布路由
+
+
+[r2-bgp]import-route ospf 1
+```
+
+
+
+
+
+
+
+
+
+#### 路由聚合
+
+```
+通过BGP的路由聚合发布
+（只能针对重发布的路由进行聚合；只能按照主类进行聚合）
+
+[r1]ip ip-prefix aa permit 172.16.0.0 16 greater-equal 24 less-equal 24
+抓流量
+
+[r1]route-policy aa permit node 10
+[r1-route-policy]if-match ip-prefix aa
+[r1-route-policy]qu
+做路由策略
+
+[r1-bgp]import-route direct route-policy aa
+调用策略
+
+[r1-bgp]summary automatic
+开启自动汇总
+```
+
+
+
+
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928092524892.png" alt="image-20260928092524892" style="zoom:67%;" />
+
+注意：聚合后，设备上会自动生成一条指向汇总的空接口路由进行防环
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```
+[r1-bgp]aggregate 172.16.0.0 22
+手工聚合
+
+
+[r4-bgplaggregate 172.16.0.0 22 detail-suppressed
+手工汇总时抑制所有子网段
+
+
+[r4]ip ip-prefix sup permit 172.16.1.0 24
+[r4]route-policy sup permit node 10
+[r4-roate-policy]if-match ip-prefix sup
+[r4-bgp]aggregate 172.16.0.0 22 suppress-policy sup
+手工汇总时抑制0.0/22下的1.0/24网段（最后一句是抑制策略，逻辑是“被允许的抑制掉，没被允许的放通”，这也是路由策略里面不需要写放通所有的原因）
+
 ```
 
+1，手工聚合后，不会自动抑制明细路由，导致路由条目的数量不减反增（所以需要上面代码框的第三种方法）
 
+2，BGP的手工聚合可以在任意位置完成，导致聚合的路由可能会丟失一部分明细路由的属性（As-Path属性会丢失，可能导致环路出现）
+
+
+
+可以看到，确实指定抑制了
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928101423696.png" alt="image-20260928101423696" style="zoom:80%;" />
+
+
+
+
+
+
+
+
+
+```
+[r4-bgp]aggregate 172.16.0.0 22 as-set
+
+```
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928102828361.png" alt="image-20260928102828361" style="zoom:80%;" />
+
+
+
+注意：如果明细路由来自于不同的AS中，在其他AS的设备上进行聚合时，激活了As-Path关键字，则汇总路由将同时携带不同明细AS_path中的AS号，需要使用大括号来括起来
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928103924294.png" alt="image-20260928103924294" style="zoom:80%;" />
+
+
+
+
+
+
+
+
+
+ATOMIC_AGGREGATE---纯粹的告警属性---当作手工聚合后，将所有的的明细路由抑制则会出现这个属性。
+AGGREGATOR---聚合者---会标出聚合设备的RID以及所在AS
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928110104299.png" alt="image-20260928110104299" style="zoom:67%;" />
+
+```
+另辟蹊径聚合
+
+[r1]ip route-static 192.168.0.0 22 NULL 0
+[r1-bgp]network 192.168.0.0 22
+```
 
 
 
