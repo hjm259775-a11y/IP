@@ -369,7 +369,7 @@ Established——————建立完成阶段————标志着对等体关
 
 [r4]route-policy pv permit node 10
 [r4-route-policy]if-match ip-prefix pv
-[r4-route-policy]apply preferred-value 100
+[r4-route-policy]apply preferred-value 100——————————————————————————————————————————————————————————
 [r4]route-policy pv permit node 20
 路由策略
 
@@ -394,7 +394,7 @@ LP-- 本地优先级---在AS内部进行选路最方便的属性--IBGP对等体
 [r3]ip ip-prefix pv permit 10.0.0.0 24
 [r3]route-policy lp permit node 10
 [r3-route-policy]if-match ip-prefix lp
-[r3-route-policy]apply local-preference 110
+[r3-route-policy]apply local-preference 110——————————————————————————————————————————————————————————————————
 [r3]route-policy lp permit node 20
 [r3-bgp]peer 4.4.4.4 route-policy lp export
 
@@ -445,7 +445,7 @@ LP-- 本地优先级---在AS内部进行选路最方便的属性--IBGP对等体
 [r1]ip ip-prefix as permit 10.0.0.0 24
 [r1]route-policy as permit node 10
 [r1-route-policy]if-match ip-prefix as
-[r1-route-policy]apply as-path 11 22 33 additive
+[r1-route-policy]apply as-path 11 22 33 additive——————————————————————————————————————————————————————————
 [r1]route-policy as permit node 20
 [r1-bgp]peer 12.0.0.2 route-policy as export
 
@@ -471,13 +471,19 @@ LP-- 本地优先级---在AS内部进行选路最方便的属性--IBGP对等体
 
 
 
+OGN————起源码————I——所有通过network发布的路由，起源码都是I
+
+​					    e ---所有通过EGP协议导入到BGP中的路由，起源码为e
+
+​					    ？---所有通过重发布导入的路由（其实是以上两种方法之外），起源码都是？
+
 
 
 ```
 [r1]ip ip-prefix ogn permit 10.0.0.0 24
 [r1]route-policy ogn permit node 10
 [r1-route-policy]if-match ip-prefix ogn
-[r1-route-policy]apply origin incomplete
+[r1-route-policy]apply origin incomplete——————————————————————————————————————（把OGN属性改成？）
 [r1]route-policy ogn permit node 20
 [r1-bgp]peer 12.0.0.2 route-policy ogn export
 
@@ -505,6 +511,23 @@ LP-- 本地优先级---在AS内部进行选路最方便的属性--IBGP对等体
 注意：如果同一个网段的路由信息来自于同一个AS的设备，则可以比较第六条；如果来自于不同AS的设备，则将不比较第六条，直接比较第七条。（IGP都可能不一样，根本没有比较的意义）
 
 
+
+
+
+
+
+举个例子：想要影响R1到R4的路由，是不是得操控R2，修改他出接口的MED
+
+```
+[r2]ip ip-prefix med permit 4.4.4.0 24
+[r2]route-policy med permit node 10
+[r2-route-policy]if-match ip-prefix med
+[r2-route-policy]apply cost 10————————————————————————————————————————————————————————
+[r2]route-policy med permit node 20
+[r2-bgp]peer 12.0.0.1 route-policy med export
+
+将传给12.0.0.1的路由的MED全改为10
+```
 
 
 
