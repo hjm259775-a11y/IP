@@ -322,24 +322,205 @@ Established——————建立完成阶段————标志着对等体关
 查看1.1.1.0/24
 ```
 
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260929084729829.png" alt="image-20260929084729829" style="zoom: 67%;" />
+
+甚至能看到因为什么导致的选路不占优
+
+
+
+
+
+
+
+
+
+
+
 
 
 <img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260928223344963.png" alt="image-20260928223344963" style="zoom:67%;" />
 
 
 
-| 属性 | 传播范围       | 默认值       | 评判标准 |
-| ---- | -------------- | ------------ | -------- |
-| PV   | 不传递（本地） | 0（0-65535） | 越大越优 |
+| 属性     | 传播范围       | 默认值            | 评判标准   |
+| -------- | -------------- | ----------------- | ---------- |
+| PV       | 不传递（本地） | 0（0-65535）      | 越大越优   |
+| LP       | IBGP对等体     | 100               | 越大越优   |
+| 路由类型 |                |                   |            |
+| AS_PATH  | BGP对等体      |                   | 越短越优   |
+| OGN      | BGP对等体      | 根据发布方式相关  | i  > e > ? |
+| MED      | BGP对等体      | 继承IGP路由开销值 | 越小越优   |
+|          |                |                   |            |
+|          |                |                   |            |
+|          |                |                   |            |
 
 
 
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260929105311056.png" alt="image-20260929105311056" style="zoom:80%;" />
 
-
-1，优选PV值最大的路由
+**1，优选PV值最大的路由**
 	PV属性是本地干涉选路最方便的属性————PV属性不能传递（华为私有属性）
 
-`[r4-bgp]peer 3.3.3.3 preferred-value 100`仅具有本地意义，将3.3.3.3传来的路由的PV值改为100
+`[r4-bgp]peer 3.3.3.3 preferred-value 100`仅具有本地意义，将3.3.3.3传来的路由的PV值改为100（3.3.3.3传来的所有的路由）
+
+```
+[r4]ip ip-prefix pv permit 10.0.0.0 24
+抓流量
+
+[r4]route-policy pv permit node 10
+[r4-route-policy]if-match ip-prefix pv
+[r4-route-policy]apply preferred-value 100
+[r4]route-policy pv permit node 20
+路由策略
+
+[r4-bgp]peer 3.3.3.3 route-policy pv import
+应用策略
+
+
+抓10.0.0.0/24网段的数据，将PV值改为100（传给自己的路由）
+```
+
+
+
+**2，优选LP值最大的路由**
+
+LP-- 本地优先级---在AS内部进行选路最方便的属性--IBGP对等体
+
+`[r3-bgp]default local-preference 110`仅限于通过 IBGP 学来的路由，而且这条命令影响的是"它发给别人的时候带 110"。
+
+
+
+```
+[r3]ip ip-prefix pv permit 10.0.0.0 24
+[r3]route-policy lp permit node 10
+[r3-route-policy]if-match ip-prefix lp
+[r3-route-policy]apply local-preference 110
+[r3]route-policy lp permit node 20
+[r3-bgp]peer 4.4.4.4 route-policy lp export
+
+抓10.0.0.0/24网段的数据，将LP值改为110（发给别人的路由）
+```
+
+
+
+
+
+**3，手工聚合 > 自动聚合 > network > import > 从对等体处学来的**
+
+
+
+`[r4-bgp]aggregate 172.16.0.0 22`手工聚合（聚合路由（尤其是自动聚合）可能造成大范围的路由黑洞。为了防止环路，设备会在本地生成一条指向 NULL0 的汇总路由（你的配置里就有 ip route-static 172.16.0.0 22 NULL 0），这条防环路由所依赖的下一跳就是本机回环接口，因此显示为 127.0.0.1。）所以在BGP表里的下一跳会写127.0.0.1
+
+
+
+``
+
+
+
+`[r4-bgp]network 172.16.0.0 22`本地宣告
+
+
+
+`[r4-bgp] import-route static`把本机路由表里的静态路由，引入（注入）到 BGP 进程中，让 BGP 能把它们宣告出去。
+
+
+
+``在别的地方敲
+
+
+
+
+
+**4，优选AS_PATH属性值最短的路由信息**
+
+
+
+注意：如果明细路由来自于不同的AS中，在其他AS的设备上进行聚合时，激活了As-Path关键字，则汇总路由将同时携带不同明细AS_path中的AS号，需要使用大括号来括起来，不过在选路上，这算一个（同样的，联邦里的小括号也算一个）
+
+
+
+
+
+```
+[r1]ip ip-prefix as permit 10.0.0.0 24
+[r1]route-policy as permit node 10
+[r1-route-policy]if-match ip-prefix as
+[r1-route-policy]apply as-path 11 22 33 additive
+[r1]route-policy as permit node 20
+[r1-bgp]peer 12.0.0.2 route-policy as export
+
+
+在原有AS_PATH属性的基础上添加AS号（additive导致的）
+```
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260929105547864.png" alt="image-20260929105547864" style="zoom:67%;" />
+
+注意：因为AS_PATH属性本身是用来防环的，所有，如果里面出现真实的AS号，则将导致改路由无法传递到该AS中，造成通信障碍。
+
+所以最好用这个`[r2-route-policy]apply as-path 1 1 1 additive`
+
+
+
+
+
+
+
+**5，Origin属性：i > e > ？ (起源码)**
+
+
+
+
+
+```
+[r1]ip ip-prefix ogn permit 10.0.0.0 24
+[r1]route-policy ogn permit node 10
+[r1-route-policy]if-match ip-prefix ogn
+[r1-route-policy]apply origin incomplete
+[r1]route-policy ogn permit node 20
+[r1-bgp]peer 12.0.0.2 route-policy ogn export
+
+将10.0.0.0/24网段传出去的OGN改为 ？
+```
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260929112725323.png" alt="image-20260929112725323" style="zoom:67%;" />
+
+
+
+
+
+**6，优选MED属性值最小的路由**
+
+​	MED——多出口鉴别属性————他的默认值继承了IGP路由表中的开销值————不同AS之间控制选路的常用逻辑（两个 AS 之间有多个互联出口时，其中一个 AS 告诉另一个 AS：“去往我这里的某个网段，请优先走哪个入口。）**这个MED反映的是去往这个网段在那个AS内部的开销值**
+
+
+
+注意：如果一台设备从自己IBGP对等体处学习到一条路由信息，则在传递出去时，将不携带MEP属性（不带属性就是为0，则可能出现选路不佳的情况。所以还是建议所有边界设备路由全部都发布）
+
+
+
+注意：如果同一个网段的路由信息来自于同一个AS的设备，则可以比较第六条；如果来自于不同AS的设备，则将不比较第六条，直接比较第七条。（IGP都可能不一样，根本没有比较的意义）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -838,25 +1019,29 @@ EBGP对等体的非直连建邻
 
 
 
+```
+[r1-bgp]aggregate 172.16.0.0 22
+手工聚合
+```
+
+
+
+```
+[r4-bgplaggregate 172.16.0.0 22 detail-suppressed
+手工汇总时抑制所有子网段
+```
+
 
 
 
 
 ```
-[r1-bgp]aggregate 172.16.0.0 22
-手工聚合
-
-
-[r4-bgplaggregate 172.16.0.0 22 detail-suppressed
-手工汇总时抑制所有子网段
-
 
 [r4]ip ip-prefix sup permit 172.16.1.0 24
 [r4]route-policy sup permit node 10
 [r4-roate-policy]if-match ip-prefix sup
 [r4-bgp]aggregate 172.16.0.0 22 suppress-policy sup
 手工汇总时抑制0.0/22下的1.0/24网段（最后一句是抑制策略，逻辑是“被允许的抑制掉，没被允许的放通”，这也是路由策略里面不需要写放通所有的原因）
-
 ```
 
 1，手工聚合后，不会自动抑制明细路由，导致路由条目的数量不减反增（所以需要上面代码框的第三种方法）
