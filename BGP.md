@@ -351,8 +351,6 @@ Established——————建立完成阶段————标志着对等体关
 | OGN      | BGP对等体      | 根据发布方式相关  | i  > e > ? |
 | MED      | BGP对等体      | 继承IGP路由开销值 | 越小越优   |
 |          |                |                   |            |
-|          |                |                   |            |
-|          |                |                   |            |
 
 
 
@@ -531,6 +529,121 @@ OGN————起源码————I——所有通过network发布的路由，
 
 
 
+**7，优选从EBGP对等体学来的路由（EBGP路由优先级高于IBGP路由）。**
+
+
+
+
+
+**8，优选到Next_Hop的IGP度量值最小的路由。**
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260930103335317.png" alt="image-20260930103335317" style="zoom:67%;" />
+
+
+
+```
+[r2-LoopBack0]ospf cost 10
+```
+
+
+
+
+
+**9，优选Cluster_List最短的路由。**
+
+
+
+​	选择簇列表最短的路由
+
+
+
+
+
+
+
+**10，优选Router ID（Orginator_ID）最小的设备通告的路由。**（没逻辑了，单纯只是选一个出来）
+
+
+
+有起源者ID就选起源者ID最小的（这就是第11条的作用，起源者ID一样的话就比第11条），没有起源者ID就选RID最小的
+
+
+
+
+
+**11，优选具有最小IP地址的对等体通告的路由。**（没逻辑了，单纯只是选一个出来）
+
+
+
+同一个网段由两个设备分别发送过来，到了11条规则，就只能比这两个设备发给自己的IP地址了
+
+
+
+
+
+
+
+
+
+
+
+==注意：前九条一致就可以负载均衡了，不过需要手动开启==
+
+
+
+
+
+
+
+## BGP路由过滤
+
+
+
+拦住R1传给R2的192.168.1.0/24网段
+
+
+
+
+
+
+
+```
+[r1jip ip-prefix aa permit 192.168.1.0 24
+
+[r1]route-policy aa deny node 10
+[r1-route-policy]if-match ip-prefix aa
+[r1]route-policy aa permit node 20
+
+[r1-bgp]peer 12.0.0.2 route-policy aa export
+
+路由策略拦截
+```
+
+
+
+
+
+```
+[r2]ip ip-prefix aa deny 192.168.1.0 24
+[r2]ip ip-prefix aa permit 0.0.0.0 0 less-equal 32————————————————————————————————————————————————需要放通所有
+
+[r2-bgp]peer 12.0.0.1 ip-prefix aa import
+
+可直接通过前缀列表进行抓取拦截
+```
+
+
+
+
+
+```
+
+
+
+使用过滤列表拦截（在peer中调用时，只能通过AcL抓取流量）
+```
 
 
 
@@ -544,6 +657,25 @@ OGN————起源码————I——所有通过network发布的路由，
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## BGP社团属性
 
 
 
