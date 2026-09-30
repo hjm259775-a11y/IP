@@ -639,25 +639,14 @@ OGN————起源码————I——所有通过network发布的路由，
 
 
 ```
+[r2-acl-basic-2000]rule deny source 192.168.3.0 0.0.0.0
+[r2-acl-basic-2000]rule permit source any————————————————————————————————————————————————————————需要放通所有
 
+[r2-bgp]peer 12.0.0.1 filter-policy 2000 import
 
 
 使用过滤列表拦截（在peer中调用时，只能通过AcL抓取流量）
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -681,6 +670,62 @@ OGN————起源码————I——所有通过network发布的路由，
 
 
 
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260930125622596.png" alt="image-20260930125622596" style="zoom:67%;" />
+
+路由信息上面会打上社团属性
+
+
+
+社团属性——32位二进制构成——表示：
+
+​	1，直接用10进制标识（如1和2）
+
+​	2，AS:NN（如600：11和600：22）
+
+注意：路由信息上的社团属性可以同时存在多个
+
+
+
+
+
+BGP设计了几个公有的社团属性：
+
+1，0X00000000（0X代表是16进制，后面8位十六进制代表32位二进制）————"internet"————所有路由默认都打上了该社团属性————要是抓这个属性，就会抓到所有路由
+
+
+
+2，0XFFFFFF02————“no-advertise”————如果一个路由打上了该社团属性，则将不会通告给任何BGP对等体
+
+
+
+3，0XFFFFFF01————"no-export"————如果一个路由打上了该社团属性，则将不会通告给任何EBGP对等体，但是可通告给自己联邦的EBGP对等体
+
+
+
+4，0XFFFFFF03————"no-export"————如果一个路由打上了该社团属性，则将不会通告给任何EBGP对等体，同时也不可以通告给自己联邦的EBGP对等体
+
+
+
+
+
+```
+[r1]ip ip-prefix aa permit 1.1.1.0 24
+[r1]route-policy aa permit node 10
+[r1-route-policy]if-match ip-prefix aa
+[r1-route-policy]apply community no-advertise————————————————————————————————————————————————社团属性改为no-advertise
+[r1]route-policy aa permit node 20
+
+[r1-bgp]peer 12.0.0.2 route-policy aa export
+
+
+[r1-bgplpeer 12.0.0.2 advertise-community——————————————————————————————只有向12.0.0.1发送路由时才开启社团属性的传递
+```
+
+注意：华为设备默认没有开启社团属性的传递
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260930161803175.png" alt="image-20260930161803175" style="zoom:50%;" />
+
+如果想要属性传递下去的话，沿途每个设备都得开启社团属性传递
 
 
 
@@ -688,6 +733,69 @@ OGN————起源码————I——所有通过network发布的路由，
 
 
 
+```
+当然也可以自定义，用于区分
+
+
+[r1]ip ip-prefix aa permit 1.1.1.0 24
+[r1]route-policy aa permit node 10
+[r1-route-policy]if-match ip-prefix aa
+[r1-route-policy]apply community 1:11————————————————————————————————————改为自定义社团属性，用于区分
+[r1]route-policy aa permit node 20
+
+[r1-bgp]peer 12.0.0.2 route-policy aa export
+
+[r1-bgp]peer 12.0.0.2 advertise-community
+```
+
+
+
+
+
+```
+换个方法，发布路由时打上社团属性
+
+
+[r1]route-policy com1 permit node 10
+[r1-route-policy]apply community 1:11
+[r1-bgp]network 172.16.1.0 24 route-policy com1
+
+[r1]route-policy com2 permit node 10
+[r1-route-policy]apply community 1:22
+[r1-bgp]network 172.16.2.0 24 route-policy com2
+```
+
+
+
+
+
+
+
+针对不同的社团属性的路由配置不同的策略也可以
+
+```
+根据社团属性抓流量（抓1：11来deny，抓1：22来设置为no-export）
+
+
+[r2]ip community-filter 1 permit 1:11————————————————————————————————————————抓取社团属性为1：11的路由，序号为1
+[r2]ip community-filter 2 permit 1:22
+
+[r2]route-policy com deny node 10
+[r2-route-policy]if-match community-filter 1
+[r2]route-policy com permit node 20
+[r2-route-policy]if-match community-filter 2
+[r2-route-policy]apply community no-export additive———————————————————————————在原有基础社团属性上添加，需要加additive
+[r2]route-policy com permit node 30
+
+[r2-bgp]peer 12.0.0.1 route-policy com import
+
+
+
+```
+
+
+
+<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260930171736895.png" alt="image-20260930171736895" style="zoom:67%;" />
 
 
 
