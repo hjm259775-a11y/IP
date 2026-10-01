@@ -20,13 +20,15 @@ RID---区分和标识不同路由设备的ID —— 32位二进制构成
 
 
 
+
+
 ### 共同包头
 
 ------------------
 
 首先，我们要知道，OSPF的数据包的头部都是一样的
 
-<img src="C:\Users\xgz24\AppData\Roaming\Typora\typora-user-images\image-20260916121837172.png" alt="image-20260916121837172" style="zoom:33%;" />
+<img src="https://raw.githubusercontent.com/hjm259775-a11y/image-hosting/main/test/20261001215243553.png" alt="image-20260916121837172" style="zoom: 33%;" />
 
 版本————OSPF的版本（用的v2版本，0000 0010）
 
