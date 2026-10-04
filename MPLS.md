@@ -482,36 +482,38 @@ R1->R2->R3->R4
 
 3，激活MPLS
 
+
+
+R1的
+
 ```
 [r1]mpls
 Info: Mpls starting, please wait.. OK!
 [r1]mpls ldp
 
 [r1-GigabitEthernet0/0/0]mpls
-[r1-GigabitEthernet0/0/0Jmpls ldp
+[r1-GigabitEthernet0/0/0]mpls ldp
+```
+
+
+
+这边再列举下R2的
+
+```
+[r2]mpls
+Info: Mpls starting, please wait.. OK!
+[r2]mpls ldp
+
+[r2-GigabitEthernet0/0/0]mpls
+[r2-GigabitEthernet0/0/0]mpls ldp
+[r2-GigabitEthernet0/0/1]mpls ldp
 ```
 
 
 
 
 
-
-
-
-
-```
-```
-
-
-
-
-
-
-
-
-
-```
-```
+就好了
 
 
 
@@ -522,6 +524,59 @@ Info: Mpls starting, please wait.. OK!
 
 
 ```
+[r1]display mpls ldp peer
+
+查看LDP对等体关系
+```
+
+<img src="C:/Users/xgz24/AppData/Roaming/Typora/typora-user-images/image-20261004172024746.png" alt="image-20261004172024746" style="zoom: 80%;" />
+
+
+
+
+
+
+
+```
+[r1]display mpls ldp session
+
+查看LDP会话
+```
+
+<img src="C:/Users/xgz24/AppData/Roaming/Typora/typora-user-images/image-20261004172140992.png" alt="image-20261004172140992" style="zoom: 80%;" />
+
+
+
+
+
+
+
+```
+[r4]display mpls lsp
+
+查看LFIB表
+```
+
+<img src="C:/Users/xgz24/AppData/Roaming/Typora/typora-user-images/image-20261004172418372.png" alt="image-20261004172418372" style="zoom:80%;" />
+
+<img src="C:/Users/xgz24/AppData/Roaming/Typora/typora-user-images/image-20261004172547945.png" alt="image-20261004172547945" style="zoom:80%;" />
+
+这里可以看到PHP
+
+
+
+
+
+
+
+注意：华为设备默认只给/32的主机路由分配标签，因为MPLS并没有主要应用在数据转发上，如果路由表中路由条目太多，则将导致生成过多LSP，造成资源浪费。
+
+
+
+```
+[r4-mpls]lsp-trigger all
+
+让设备给除了/32主机路由外的路由分配标签
 ```
 
 
@@ -540,8 +595,25 @@ Info: Mpls starting, please wait.. OK!
 
 
 
-```
-```
+
+
+
+
+# MPLS VPN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
