@@ -511,9 +511,11 @@ Info: Mpls starting, please wait.. OK!
 
 
 
-
-
 就好了
+
+
+
+
 
 
 
@@ -567,6 +569,22 @@ Info: Mpls starting, please wait.. OK!
 
 
 
+```
+[r2]display fib verbose
+
+查看FIB表的细节信息
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 注意：华为设备默认只给/32的主机路由分配标签，因为MPLS并没有主要应用在数据转发上，如果路由表中路由条目太多，则将导致生成过多LSP，造成资源浪费。
@@ -599,10 +617,222 @@ Info: Mpls starting, please wait.. OK!
 
 
 
+# MPLS解决BGP路由黑洞
+
+
+
+说了这么多，该把BGP路由黑洞的坑填一填了
+
+
+
+
+
+<img src="C:/Users/xgz24/AppData/Roaming/Typora/typora-user-images/image-20261004200605335.png" alt="image-20261004200605335" style="zoom: 80%;" />
+
+配完MLPS和LDP后依然通不了，在R2上看，结果发现竟然是递归查找从目标的6.6.6.6网段一路递归到23.0.0.2，压根没有没有用标签交换，仍然在用IP
+
+
+
+```
+[r2]route recursive-lookup tunnel
+
+在进行路由查找时如果有隧道就递归进隧道
+```
+
+
+
+```
+[r5]route recursive-lookup tunnel
+
+回包也需要递归隧道
+```
+
+
+
+其他的正常配置就行了
+
+
+
+
+
+
+
 # MPLS VPN
 
 
 
+MPLS VPN是一种由运营商提供的，专门解决虚拟专线安全及带宽问题的综合解决方案。
+
+
+
+<img src="C:/Users/xgz24/AppData/Roaming/Typora/typora-user-images/image-20261004210515097.png" alt="image-20261004210515097" style="zoom:67%;" />
+
+*   站点————可以理解为是一个组织机构在不同地理位置设置的不同的P网络。
+
+*   PE————服务提供商边界设备————需要连接CE设备——需要接受客户私网的路由信息，还需要将私网的路由信息传递到远端的PE设备上，这部分路由的传输主要使用BGP协议来进行传递。（注意是传递，就是说还是需要IGP的，但只是认路而已）
+
+*   CE————客户网络的边界设备————需要连接PE设备——
+
+*   P————中间的P设备只需要完成路由信息的高度转发就行
+
+*   C————不重要
+
+
+
+
+
+
+
+我们可以看到，客户A和客户B的信息都传到同一个PE设备上了，安全性显然无法保证，这个时候需要一个新技术：
+
+
+
+## VRF
+
+————虚拟路由转发
+
+————也叫VPN instance(VPN实例)
+
+
+
+​	我们可以将一台真实的物理设备抽象出多台虚拟的设备。每一个虚拟的设备就被称为一个VRF空间，每个VRF空间都拥有独立的路由表，FIB表，动态路由协议，及接口。
+
+<img src="C:/Users/xgz24/AppData/Roaming/Typora/typora-user-images/image-20261004213340206.png" alt="image-20261004213340206" style="zoom:67%;" />
+
+PE指的是其他还没划分的接口的路由，放进全局路由表
+
+
+
+
+
+那你仔细一想，要是客户A里面有网段和客户B里面一样，那传递的时候不就炸了吗，该怎么进行区分？
+
+**RD码**————64位二进制————AS：NN表示
+
+想象一下，路由在传递的时候是100:100 192.168.1.0/24和200:200 192.168.1.0/24
+
+<img src="C:/Users/xgz24/AppData/Roaming/Typora/typora-user-images/image-20261004214346471.png" alt="image-20261004214346471" style="zoom:67%;" />
+
+VPNV4路由————IPV4路由信息前面添加上RD值之后，从原来的32位变为96位（RD值只管路由转发时的区分，到了RE设备后就会自动脱掉）
+
+
+
+所以，还需要一个东西来在PE上区分这是哪个VRE的：
+
+**RT值**————路由目标值---VPN Target---32位二进制构成（**同下**）（这是MP-BGP分配的）
+
+​	每一个VRF都需要有一个出站RT值和入站RT值
+
+例子：PE1的VRF1：入站RT为100:1，出站RT为100:2
+
+​	  PE2的VRF1：入站RT为100:2，出站RT为100:1（显而易见，自己出站要等于对面的入站，这样才能分清楚）
+
+
+
+
+
+
+
+路由都改变了，原来的BGP也不太合适了，升级一下，变成MP-BGP协议
+
+## MP-BGP
+
+
+
+一环扣一环，因为安全问题需要用VRF进行设备区分，又因为设备区分导致路由可能相同，不得已将路由长度改为96位二进制进行区分（加上RD），结果导致BGP不支持此协议簇，只好选用MP-BGP🤪
+
+
+
+MP-BGP————可以针对多种地址组的路由信息来进行携带。如果需要传递VPNV4路由，则需要使用MP-BGP来进行传递。
+
+
+
+
+
+**RT值**————路由目标值---VPN Target---32位二进制构成（**同上**）（RD值在到了PE设备时就已经删除了）
+
+出站RT值——Export RT——PE设备为不同VRF空间配置不同的出站RT，发出由社团属性携带，需要和远端PE设备上的入站RT对应。
+
+入站RT值——lmport RT——PE设备为不同VRF空间配置不同的入站RT，根据社团属性中携带的值进行比对，将其放入对应的VRF空间当中。
+
+​	每一个VRF都需要有一个出站RT值和入站RT值	
+
+​		例子：PE1的VRF1：入站RT为100:1，出站RT为100:2
+
+​	 		 PE2的VRF1：入站RT为100:2，出站RT为100:1（显而易见，自己出站要等于对面的入站，这样才能分清楚）
+
+​	  		PE1的VRF2：入站RT为200:1，出站RT为200:2
+
+​	 		 PE2的VRF2：入站RT为200:2，出站RT为200:1
+
+这个RT值会写在BGP的社团属性里面🤔
+
+
+
+
+
+------------------
+
+以上是控制层面的，以下是数据层面的
+
+------------------
+
+
+
+
+
+数据层流量————数据层流量主要是在到达远端PE设备上时无法分辨到底加入到哪个VRF空间中，所以，需要使用双层标签来进行区分。（为什么不用RT？是因为真正要传数据的时候使用的MPLS而非MP-BGP）
+
+
+
+————外层标签（靠近二层）--公网标签---由LDP协议来分配，其目的是为了保证数据可以正常的通过MPLS域，到达远端PE。（MPLS换的标签也是他）
+
+————内层标签（靠近三层）--私网标签---由MP-BGP协议来分配，目的是在远端PE设备上弹出外层标签后，可以根据内层标签判断到底是到达哪个VRF的数据流量。内层标签需要和VRF空间存在对应关系，这个标签是由MP-BGP分配后，通过社团属性随着路由传递到达对端PE。
+
+
+
+<img src="C:/Users/xgz24/AppData/Roaming/Typora/typora-user-images/image-20261004225334812.png" alt="image-20261004225334812" style="zoom: 50%;" />
+
+用外层来进行MPLS转发，用内层来区分VRF
+
+
+
+
+
+
+
+## 配置
+
+
+
+
+
+<img src="C:/Users/xgz24/AppData/Roaming/Typora/typora-user-images/image-20261004225128353.png" alt="image-20261004225128353" style="zoom:80%;" />
+
+什么IGP，MPLS都先自己配好
+
+
+
+```
+[r2]ip vpn-instance a——————————————————————————————————————————创建VRF空间（华为设备的名称大小写敏感）
+[r2-vpn-instance-a]
+
+[r2-vpn-instance-alroute-distinguisher 100:100——————————————————配置本VRF的RD码
+[r2-vpn-instance-a-af-ipv4]
+
+[r2-vpn-instance-a-af-ipv4]vpn-target 100:1 export-extcommunity—————————————————————配置本VRF的出站RT值
+[r2-vpn-instance-a-af-ipv4]vpn-target 100:2 import-extcommunity—————————————————————配置本VRF的入站RT值
+```
+
+
+
+
+
+配置好VRF后，还需要将接口划入到VRF中
+
+```
+[r2-GigabitEthernet0/0/0] ip binding vpn-instance a
+```
 
 
 
@@ -612,10 +842,11 @@ Info: Mpls starting, please wait.. OK!
 
 
 
+```
 
 
 
-
+```
 
 
 
