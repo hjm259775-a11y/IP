@@ -719,7 +719,7 @@ VPNV4路由————IPV4路由信息前面添加上RD值之后，从原来的
 
 所以，还需要一个东西来在PE上区分这是哪个VRE的：
 
-**RT值**————路由目标值---VPN Target---32位二进制构成（**同下**）（这是MP-BGP分配的）
+**RT值**————路由目标值---VPN Target---32位二进制构成（**同下**）（这是MP-BGP分配的）————就是让本端PE分辨这是哪个VRF的
 
 ​	每一个VRF都需要有一个出站RT值和入站RT值
 
@@ -749,7 +749,7 @@ MP-BGP————可以针对多种地址组的路由信息来进行携带。�
 
 
 
-**RT值**————路由目标值---VPN Target---32位二进制构成（**同上**）（RD值在到了PE设备时就已经删除了）
+**RT值**————路由目标值---VPN Target---32位二进制构成（**同上**）（RD值在到了PE设备时就已经删除了）————就是和对端PE分辨这是哪个VRF的
 
 出站RT值——Export RT——PE设备为不同VRF空间配置不同的出站RT，发出由社团属性携带，需要和远端PE设备上的入站RT对应。
 
@@ -832,6 +832,86 @@ MP-BGP————可以针对多种地址组的路由信息来进行携带。�
 
 ```
 [r2-GigabitEthernet0/0/0] ip binding vpn-instance a
+
+将接口划入到VRF中
+```
+
+当然，也别忘了给IP地址
+
+
+
+
+
+
+
+
+
+------------------------
+
+```
+[r4]display ip routing-table vpn-instance b
+ 查看VRF空间中的路由表
+ 
+ [r2]ping -vpn-instance a 192.168.2.1
+ 根据VRF空间里面的路由信息发送数据包
+ 
+ [r2]ip route-static vpn-instance a 192.168.1.0 24 192.168.2.1
+ 往VRF空间里面添加路由信息
+ 
+ [r4]display bgp vpnv4 vpn-instance b routing-table
+ 查看VRF空间中的BGP表
+```
+
+添加
+
+------------------------------
+
+
+
+
+
+
+
+
+
+R4也要创建VRF
+
+```
+[r4]ip vpn-instance b——————————————————————————————————————————创建VRF空间（华为设备的名称大小写敏感）
+[r4-vpn-instance-b]
+
+[r2-vpn-instance-alroute-distinguisher 200:100——————————————————配置本VRF的RD码
+[r2-vpn-instance-a-af-ipv4]
+
+[r2-vpn-instance-a-af-ipv4]vpn-target 100:1 export-extcommunity—————————————————————配置本VRF的出站RT值
+[r2-vpn-instance-a-af-ipv4]vpn-target 100:2 import-extcommunity—————————————————————配置本VRF的入站RT值
+```
+
+
+
+
+
+
+
+以下是MP-BGP
+
+
+
+```
+[r2-bgp]ipv4-family vpnv4
+[r2-bgp-af-vpnv4]peer 4.4.4.4 enable
+
+启用MP-BGP，并且和4.4.4.4交流时用MP-BGP
+```
+
+
+
+```
+[r2-bgp]ipv4-family vpn-instance a
+[r2-bgp-a]import-route static
+[r2-bgp-a]import-route direct
+
+在VPN空间中导入路由
 ```
 
 
@@ -842,19 +922,15 @@ MP-BGP————可以针对多种地址组的路由信息来进行携带。�
 
 
 
+
+
+------------------------
+
+假设R4右边用的是OSPF，那在R4上配置OSPF时还需要进入空间中去配置
+
 ```
-
-
-
+[r4]ospf 2 vpn-instance router-id 4.4.4.4
 ```
-
-
-
-
-
-
-
-
 
 
 
