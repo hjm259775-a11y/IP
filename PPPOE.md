@@ -164,6 +164,7 @@ PPPoE协议采用C/S方式，将PPP报文封装在以太网帧之内，使PPP帧
 [PPPOS server]aaa
 [PPPOS server-aaa]local-user xuaner password cipher xgz123
 [PPPOS server-aaa]local-user xuaner service-type ppp 
+进入到认证管理视图
 创建用于拨号验证的用户，服务类型为PPP
 用户名为xuaner，密码为xgz123
 
